@@ -73,7 +73,7 @@ private:
 
 	//	Asservissement en position : rotation
 	PID rotationPID;
-	volatile int32_t rotationSetpoint;		// ticks
+	volatile int32_t rotationSetpoint;		// angle absolu visé (en ticks)
 	volatile int32_t currentAngle;			// ticks
 	volatile int32_t rotationSpeed;			// ticks/seconde
 

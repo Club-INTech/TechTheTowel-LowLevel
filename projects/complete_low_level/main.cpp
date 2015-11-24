@@ -63,6 +63,24 @@ int main(void)
 				serial.printfln("_");//Acquittement
 				motionControlSystem->orderRotation(angle);
 			}
+
+			else if(!strcmp("tor", order))  // Ordre de rotation seulement à DROITE (pour ne pas perdre le sable)
+			{
+				float angle = motionControlSystem->getAngleRadian();
+				serial.read(angle);
+				serial.printfln("_");//Acquittement
+				motionControlSystem->orderRotationRight(angle);
+			}
+
+			else if(!strcmp("tol", order))  // Ordre de rotation seulement à GAUCHE (pour ne pas perdre le sable)
+			{
+				float angle = motionControlSystem->getAngleRadian();
+				serial.read(angle);
+				serial.printfln("_");//Acquittement
+				motionControlSystem->orderRotationLeft(angle);
+			}
+
+
 			else if(!strcmp("t3", order))		//Ordre de rotation via un angle relatif (en radians)
 			{
 				float angle_actuel = motionControlSystem->getAngleRadian(), delta_angle = 0;

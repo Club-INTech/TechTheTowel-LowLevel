@@ -280,7 +280,7 @@ void MotionControlSystem::orderRotation(float angleConsigneRadian) {
 
 	int32_t rotationTick = (angleConsigneTick % deuxPiTick) - (angleCourantTick % deuxPiTick);
 
-	if(rotationTick > piTick)
+	if(rotationTick >= piTick)
 	{
 		rotationTick -= deuxPiTick;
 	}
@@ -299,6 +299,42 @@ void MotionControlSystem::orderRotation(float angleConsigneRadian) {
 	direction = NONE;
 	moveAbnormal = false;
 }
+
+void MotionControlSystem::orderRotationRight(float angleConsigneRadian) {
+
+
+	static int32_t deuxPiTick = 2*PI / TICK_TO_RADIAN;
+	static int32_t piTick = PI / TICK_TO_RADIAN;
+
+	int32_t highLevelOffset = originalAngle / TICK_TO_RADIAN; // Angle de l'origine du repère
+
+	int32_t angleConsigneTick = angleConsigneRadian / TICK_TO_RADIAN;
+	int32_t angleCourantTick = currentAngle + highLevelOffset; // angle avant mouvement
+
+
+	int32_t rotationTick = (angleConsigneTick % deuxPiTick) - (angleCourantTick % deuxPiTick);
+
+	// Jusque ici, on fait en sorte de ne pas faire plusieurs tours (cf modulo)
+
+	int32_t setpoint = angleCourantTick + rotationTick - highLevelOffset;
+
+	if(setPoint>0) // Si l'angle cible est positif
+	{
+		setPoint = setPoint - deuxPiTick ; // on le redonne en négatif pour forcer à tourner à droite
+	}
+
+	rotationSetpoint = setPoint ;
+
+	if(!moving)
+	{
+		rotationPID.resetErrors();
+		moving = true;
+	}
+	direction = NONE;
+	moveAbnormal = false;
+}
+
+
 
 void MotionControlSystem::orderRawPwm(Side side, int16_t pwm) {
 	if (side == Side::LEFT)
