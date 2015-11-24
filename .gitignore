@@ -1,23 +1,16 @@
 *~
 *.o
 *.so
-*.user
-*.project
-software/arm/*/*.cogui
-software/arm/*/*.comarker
-software/arm/build
-software/bin/
-/software/pc/logs/
-/software/pc/config/local.ini
-.classpath
-.cproject
-.settings
-project.properties
+*.cogui
+*.comarker
+/build/
+
+**/projects/**/*.coproj
+
+#Fichiers python compilés
+*.pyc
+
+#Fichiers Eagle
 hardware/*/*.b\#*
 hardware/*/*.s\#*
 hardware/*/*.epf
-*.class
-/bin/
-/Debug/
-.metadata/
-.recommenders/
