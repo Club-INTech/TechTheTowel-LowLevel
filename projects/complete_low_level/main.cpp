@@ -72,6 +72,8 @@ int main(void)
 				motionControlSystem->orderRotationRight(angle);
 			}
 
+
+
 			else if(!strcmp("tol", order))  // Ordre de rotation seulement à GAUCHE (pour ne pas perdre le sable)
 			{
 				float angle = motionControlSystem->getAngleRadian();

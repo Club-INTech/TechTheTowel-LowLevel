@@ -186,6 +186,8 @@ public:
 
 	void orderTranslation(int32_t);
 	void orderRotation(float);
+	void orderRotationRight(float);
+	void orderRotationLeft(float);
 	void orderRawPwm(Side,int16_t);
 	void stop();
 	static int32_t optimumAngle(int32_t,int32_t);

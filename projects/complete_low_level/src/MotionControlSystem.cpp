@@ -302,6 +302,8 @@ void MotionControlSystem::orderRotation(float angleConsigneRadian) {
 
 void MotionControlSystem::orderRotationRight(float angleConsigneRadian) {
 
+	// Donne une consigne d'angle ABSOLUE et force la rotation à droite
+	// (Pour ne pas perdre le sable)
 
 	static int32_t deuxPiTick = 2*PI / TICK_TO_RADIAN;
 	static int32_t piTick = PI / TICK_TO_RADIAN;
@@ -314,16 +316,17 @@ void MotionControlSystem::orderRotationRight(float angleConsigneRadian) {
 
 	int32_t rotationTick = (angleConsigneTick % deuxPiTick) - (angleCourantTick % deuxPiTick);
 
-	// Jusque ici, on fait en sorte de ne pas faire plusieurs tours (cf modulo)
+	// On fait en sorte de ne pas faire plusieurs tours (cf modulo)
 
-	int32_t setpoint = angleCourantTick + rotationTick - highLevelOffset;
 
-	if(setPoint>0) // Si l'angle cible est positif
+
+	if(rotationTick > 0)
 	{
-		setPoint = setPoint - deuxPiTick ; // on le redonne en négatif pour forcer à tourner à droite
+		rotationTick = rotationTick - deuxPiTick ;
 	}
 
-	rotationSetpoint = setPoint ;
+	rotationSetpoint = angleCourantTick + rotationTick - highLevelOffset;
+
 
 	if(!moving)
 	{
@@ -334,6 +337,40 @@ void MotionControlSystem::orderRotationRight(float angleConsigneRadian) {
 	moveAbnormal = false;
 }
 
+void MotionControlSystem::orderRotationLeft(float angleConsigneRadian) {
+
+
+	static int32_t deuxPiTick = 2*PI / TICK_TO_RADIAN;
+	static int32_t piTick = PI / TICK_TO_RADIAN;
+
+	int32_t highLevelOffset = originalAngle / TICK_TO_RADIAN; // Angle de l'origine du repère
+
+	int32_t angleConsigneTick = angleConsigneRadian / TICK_TO_RADIAN;
+	int32_t angleCourantTick = currentAngle + highLevelOffset; // angle avant mouvement
+
+
+	int32_t rotationTick = (angleConsigneTick % deuxPiTick) - (angleCourantTick % deuxPiTick);
+
+	// On fait en sorte de ne pas faire plusieurs tours (cf modulo)
+
+
+
+	if(rotationTick < 0)
+	{
+		rotationTick = rotationTick + deuxPiTick ;
+	}
+
+	rotationSetpoint = angleCourantTick + rotationTick - highLevelOffset;
+
+
+	if(!moving)
+	{
+		rotationPID.resetErrors();
+		moving = true;
+	}
+	direction = NONE;
+	moveAbnormal = false;
+}
 
 
 void MotionControlSystem::orderRawPwm(Side side, int16_t pwm) {
