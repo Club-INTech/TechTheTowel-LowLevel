@@ -12,6 +12,7 @@
 #include "Counter.h"
 #include <Uart.hpp>
 #include "average.hpp"
+#include "utils.h"
 
 #define PI 3.14159265
 
@@ -36,6 +37,17 @@ extern Uart<1> serial;
 
 class MotionControlSystem : public Singleton<MotionControlSystem>
 {
+public:
+
+	/* Définit le sens dans lequel on doit tourner pour répondre à une consigne de rotation */
+	enum RotationWay
+	{
+		FREE,		// On doit tourner dans le sens correspondant au chemin le plus court
+		TRIGO,		// On doit tourner vers la droite
+		ANTITRIGO	// On doit tourner vers la gauche
+	};
+
+
 private:
 	Motor leftMotor;
 	Motor rightMotor;
@@ -185,9 +197,7 @@ public:
 	void enableRotationControl(bool);
 
 	void orderTranslation(int32_t);
-	void orderRotation(float);
-	void orderRotationRight(float);
-	void orderRotationLeft(float);
+	void orderRotation(float, RotationWay);
 	void orderRawPwm(Side,int16_t);
 	void stop();
 	static int32_t optimumAngle(int32_t,int32_t);

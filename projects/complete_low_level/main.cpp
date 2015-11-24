@@ -61,7 +61,7 @@ int main(void)
 				float angle = motionControlSystem->getAngleRadian();
 				serial.read(angle);
 				serial.printfln("_");//Acquittement
-				motionControlSystem->orderRotation(angle);
+				motionControlSystem->orderRotation(angle, MotionControlSystem::FREE);
 			}
 
 			else if(!strcmp("tor", order))  // Ordre de rotation seulement à DROITE (pour ne pas perdre le sable)
@@ -69,7 +69,7 @@ int main(void)
 				float angle = motionControlSystem->getAngleRadian();
 				serial.read(angle);
 				serial.printfln("_");//Acquittement
-				motionControlSystem->orderRotationRight(angle);
+				motionControlSystem->orderRotation(angle, MotionControlSystem::ANTITRIGO);
 			}
 
 
@@ -79,7 +79,7 @@ int main(void)
 				float angle = motionControlSystem->getAngleRadian();
 				serial.read(angle);
 				serial.printfln("_");//Acquittement
-				motionControlSystem->orderRotationLeft(angle);
+				motionControlSystem->orderRotation(angle, MotionControlSystem::TRIGO);
 			}
 
 
@@ -88,14 +88,14 @@ int main(void)
 				float angle_actuel = motionControlSystem->getAngleRadian(), delta_angle = 0;
 				serial.read(delta_angle);
 				serial.printfln("_");
-				motionControlSystem->orderRotation(angle_actuel + delta_angle);
+				motionControlSystem->orderRotation(angle_actuel + delta_angle, MotionControlSystem::FREE);
 			}
 			else if(!strcmp("r", order))		//Ordre de rotation via un angle relatif (en degrés)
 			{
 				float angle_actuel = motionControlSystem->getAngleRadian()*180/PI, delta_angle = 0;
 				serial.read(delta_angle);
 				serial.printfln("_");
-				motionControlSystem->orderRotation((angle_actuel + delta_angle)*PI/180);
+				motionControlSystem->orderRotation((angle_actuel + delta_angle)*PI/180, MotionControlSystem::FREE);
 			}
 			else if(!strcmp("stop",order))		//Ordre d'arrêt (asservissement à la position actuelle)
 			{

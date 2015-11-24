@@ -268,7 +268,7 @@ void MotionControlSystem::orderTranslation(int32_t mmDistance) {
 	moveAbnormal = false;
 }
 
-void MotionControlSystem::orderRotation(float angleConsigneRadian) {
+void MotionControlSystem::orderRotation(float angleConsigneRadian, RotationWay rotationWay) {
 
 	static int32_t deuxPiTick = 2*PI / TICK_TO_RADIAN;
 	static int32_t piTick = PI / TICK_TO_RADIAN;
@@ -278,90 +278,38 @@ void MotionControlSystem::orderRotation(float angleConsigneRadian) {
 	int32_t angleConsigneTick = angleConsigneRadian / TICK_TO_RADIAN;
 	int32_t angleCourantTick = currentAngle + highLevelOffset;
 
-	int32_t rotationTick = (angleConsigneTick % deuxPiTick) - (angleCourantTick % deuxPiTick);
+	angleConsigneTick = modulo(angleConsigneTick, deuxPiTick);
+	angleCourantTick = modulo(angleCourantTick, deuxPiTick);
 
-	if(rotationTick >= piTick)
+	int32_t rotationTick = angleConsigneTick - angleCourantTick;
+
+	if(rotationWay == FREE)
 	{
-		rotationTick -= deuxPiTick;
+		if(rotationTick >= piTick)
+		{
+			rotationTick -= deuxPiTick;
+		}
+		else if(rotationTick < -piTick)
+		{
+			rotationTick += deuxPiTick;
+		}
 	}
-	else if(rotationTick < -piTick)
+	else if(rotationWay == TRIGO)
 	{
-		rotationTick += deuxPiTick;
+		if(rotationTick < 0)
+		{
+			rotationTick += deuxPiTick;
+		}
 	}
-
-	rotationSetpoint = angleCourantTick + rotationTick - highLevelOffset;
-
-	if(!moving)
+	else if(rotationWay == ANTITRIGO)
 	{
-		rotationPID.resetErrors();
-		moving = true;
-	}
-	direction = NONE;
-	moveAbnormal = false;
-}
-
-void MotionControlSystem::orderRotationRight(float angleConsigneRadian) {
-
-	// Donne une consigne d'angle ABSOLUE et force la rotation à droite
-	// (Pour ne pas perdre le sable)
-
-	static int32_t deuxPiTick = 2*PI / TICK_TO_RADIAN;
-	static int32_t piTick = PI / TICK_TO_RADIAN;
-
-	int32_t highLevelOffset = originalAngle / TICK_TO_RADIAN; // Angle de l'origine du repère
-
-	int32_t angleConsigneTick = angleConsigneRadian / TICK_TO_RADIAN;
-	int32_t angleCourantTick = currentAngle + highLevelOffset; // angle avant mouvement
-
-
-	int32_t rotationTick = (angleConsigneTick % deuxPiTick) - (angleCourantTick % deuxPiTick);
-
-	// On fait en sorte de ne pas faire plusieurs tours (cf modulo)
-
-
-
-	if(rotationTick > 0)
-	{
-		rotationTick = rotationTick - deuxPiTick ;
+		if(rotationTick > 0)
+		{
+			rotationTick -= deuxPiTick;
+		}
 	}
 
-	rotationSetpoint = angleCourantTick + rotationTick - highLevelOffset;
-
-
-	if(!moving)
-	{
-		rotationPID.resetErrors();
-		moving = true;
-	}
-	direction = NONE;
-	moveAbnormal = false;
-}
-
-void MotionControlSystem::orderRotationLeft(float angleConsigneRadian) {
-
-
-	static int32_t deuxPiTick = 2*PI / TICK_TO_RADIAN;
-	static int32_t piTick = PI / TICK_TO_RADIAN;
-
-	int32_t highLevelOffset = originalAngle / TICK_TO_RADIAN; // Angle de l'origine du repère
-
-	int32_t angleConsigneTick = angleConsigneRadian / TICK_TO_RADIAN;
-	int32_t angleCourantTick = currentAngle + highLevelOffset; // angle avant mouvement
-
-
-	int32_t rotationTick = (angleConsigneTick % deuxPiTick) - (angleCourantTick % deuxPiTick);
-
-	// On fait en sorte de ne pas faire plusieurs tours (cf modulo)
-
-
-
-	if(rotationTick < 0)
-	{
-		rotationTick = rotationTick + deuxPiTick ;
-	}
-
-	rotationSetpoint = angleCourantTick + rotationTick - highLevelOffset;
-
+	rotationSetpoint = currentAngle + rotationTick;
 
 	if(!moving)
 	{
