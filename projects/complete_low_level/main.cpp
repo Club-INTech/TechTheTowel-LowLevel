@@ -148,11 +148,10 @@ int main(void)
 			}
 			else if(!strcmp("ctv",order))   //Régler la vitesse de translation
 			{
-				int pwmMaxTranslation = 10;
-				serial.read(pwmMaxTranslation);
+				float speed = 0; // unité de speed : mm/s
+				serial.read(speed);
 				serial.printfln("_");
-				//motionControlSystem->setSmartTranslationTunings();
-				//TODO
+				motionControlSystem->setTranslationSpeed(speed);
 			}
 			else if(!strcmp("crv",order))  //Régler la vitesse de rotation
 			{

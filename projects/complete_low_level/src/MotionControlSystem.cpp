@@ -548,6 +548,25 @@ void MotionControlSystem::setRightSpeedTunings(float kp, float ki, float kd) {
 	rightSpeedPID.setTunings(kp, ki, kd);
 }
 
+void MotionControlSystem::setTranslationSpeed(float raw_speed)
+{
+	//Conversion de speed de mm/s en ticks/s
+	int speed = raw_speed / TICK_TO_MM;
+
+	if (speed <= 4000){
+		maxSpeed = speed;
+	}
+	else if (speed < 0){ // SINGEPROOF
+		maxSpeed = 0;
+	}
+	else if(speed > 4000){
+		maxSpeed = 4000;
+	}
+
+
+}
+
+
 void MotionControlSystem::setPWM() {
 	leftMotor.run(leftPWM);
 	rightMotor.run(rightPWM);

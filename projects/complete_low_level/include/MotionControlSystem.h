@@ -225,6 +225,7 @@ public:
 	void setMaxPWMtranslation(int16_t);
 	void setMaxPWMrotation(int16_t);
 	void setDelayToStop(uint32_t);
+	void setTranslationSpeed(float);
 	void setPWM();
 
 	bool isMoving() const;
