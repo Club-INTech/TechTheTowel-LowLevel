@@ -155,10 +155,10 @@ int main(void)
 			}
 			else if(!strcmp("crv",order))  //Régler la vitesse de rotation
 			{
-				int pwmMaxRotation = 10;
-				serial.read(pwmMaxRotation);
+				float speedRotation = 0;
+				serial.read(speedRotation);
 				serial.printfln("_");
-				//motionControlSystem->setSmartRotationTunings();
+				motionControlSystem->setRotationSpeed(speedRotation);
 				//TODO
 			}
 

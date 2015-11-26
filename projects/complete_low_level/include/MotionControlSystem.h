@@ -89,8 +89,10 @@ private:
 	volatile int32_t currentAngle;			// ticks
 	volatile int32_t rotationSpeed;			// ticks/seconde
 
-	//	Limitation de vitesse
-	volatile int32_t maxSpeed;
+	//	Limitation de vitesses
+	volatile int32_t maxSpeed; 				// definit la vitesse maximal des moteurs du robot
+	volatile int32_t maxSpeedTranslation;	// definit la consigne max de vitesse de translation envoiée au PID (trapèze)
+	volatile int32_t maxSpeedRotation;		// definit la consigne max de vitesse de rotation envoiée au PID (trapèze)
 
 	//	Limitation d'accélération
 	volatile int32_t maxAcceleration;
@@ -218,15 +220,9 @@ public:
 	void setX(float);
 	void setY(float);
 	void resetPosition(void);
-	float getBalance() const;
-	void setBalance(float newBalance);
-	int16_t getMaxPWMtranslation() const;
-	int16_t getMaxPWMrotation() const;
-	void setMaxPWMtranslation(int16_t);
-	void setMaxPWMrotation(int16_t);
 	void setDelayToStop(uint32_t);
 	void setTranslationSpeed(float);
-	void setPWM();
+	void setRotationSpeed(float);
 
 	bool isMoving() const;
 	bool isMoveAbnormal() const;

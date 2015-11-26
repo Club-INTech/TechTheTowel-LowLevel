@@ -26,7 +26,9 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	leftSpeedPID.setOutputLimits(-255,255);
 	rightSpeedPID.setOutputLimits(-255,255);
 
-	maxSpeed =3000; //Vitesse maximum, des moteurs (avec une marge au cas où on s'amuse à faire forcer un peu la bestiole).
+	maxSpeed = 4000; // Vitesse maximum, des moteurs (avec une marge au cas où on s'amuse à faire forcer un peu la bestiole).
+	maxSpeedTranslation = 3000;
+	maxSpeedRotation = 1500;
 	maxAcceleration = 15;
 
 	delayToStop = 100;
@@ -150,8 +152,35 @@ void MotionControlSystem::control()
 	if(rotationControlled)
 		rotationPID.compute();		// Actualise la valeur de 'rotationSpeed'
 
+
+	// Limitation de la consigne de vitesse en translation
+	if(translationSpeed > maxSpeedTranslation)
+		translationSpeed = maxSpeedTranslation;
+	else if(translationSpeed < -maxSpeedTranslation)
+		translationSpeed = -maxSpeedTranslation;
+
+
+	// Limitation de la consigne de vitesse en rotation
+	if(rotationSpeed > maxSpeedRotation)
+		rotationSpeed = maxSpeedRotation;
+	else if(rotationSpeed < -maxSpeedRotation)
+		rotationSpeed = -maxSpeedRotation;
+
+
 	leftSpeedSetpoint = translationSpeed - rotationSpeed;
 	rightSpeedSetpoint = translationSpeed + rotationSpeed;
+
+
+
+	// Limitation de la vitesses
+	if(leftSpeedSetpoint > maxSpeed)
+		leftSpeedSetpoint = maxSpeed;
+	else if(leftSpeedSetpoint < -maxSpeed)
+		leftSpeedSetpoint = -maxSpeed;
+	if(rightSpeedSetpoint > maxSpeed)
+		rightSpeedSetpoint = maxSpeed;
+	else if(rightSpeedSetpoint < -maxSpeed)
+		rightSpeedSetpoint = -maxSpeed;
 
 
 	// Limitation de l'accélération du moteur gauche
@@ -174,15 +203,6 @@ void MotionControlSystem::control()
 		rightSpeedSetpoint = previousRightSpeedSetpoint - maxAcceleration;
 	}
 
-	// Limitation de la vitesse
-	if(leftSpeedSetpoint > maxSpeed)
-		leftSpeedSetpoint = maxSpeed;
-	else if(leftSpeedSetpoint < -maxSpeed)
-		leftSpeedSetpoint = -maxSpeed;
-	if(rightSpeedSetpoint > maxSpeed)
-		rightSpeedSetpoint = maxSpeed;
-	else if(rightSpeedSetpoint < -maxSpeed)
-		rightSpeedSetpoint = -maxSpeed;
 
 	previousLeftSpeedSetpoint = leftSpeedSetpoint;
 	previousRightSpeedSetpoint = rightSpeedSetpoint;
@@ -548,29 +568,37 @@ void MotionControlSystem::setRightSpeedTunings(float kp, float ki, float kd) {
 	rightSpeedPID.setTunings(kp, ki, kd);
 }
 
+/* Definit la vitesse de translation du robot
+ */
 void MotionControlSystem::setTranslationSpeed(float raw_speed)
 {
-	//Conversion de speed de mm/s en ticks/s
+	//Conversion de raw_speed de mm/s en ticks/s
 	int speed = raw_speed / TICK_TO_MM;
 
-	if (speed <= 4000){
-		maxSpeed = speed;
+	if (speed < 0){ // SINGEPROOF
+		maxSpeedTranslation = 0;
 	}
-	else if (speed < 0){ // SINGEPROOF
-		maxSpeed = 0;
+	else {
+		maxSpeedTranslation = speed;
 	}
-	else if(speed > 4000){
-		maxSpeed = 4000;
+}
+/* Definit la vitesse de rotation du robot
+ */
+void MotionControlSystem::setRotationSpeed(float raw_speed) // En Rad/s
+{
+	// Conversion de raw_speed de rad/s en ticks/s
+	int speed = raw_speed / TICK_TO_RADIAN;
+	if (speed < 0) {
+		maxSpeedRotation = 0;
 	}
-
-
+	else {
+		maxSpeedRotation = speed;
+	}
 }
 
 
-void MotionControlSystem::setPWM() {
-	leftMotor.run(leftPWM);
-	rightMotor.run(rightPWM);
-}
+
+
 
 
 /*
