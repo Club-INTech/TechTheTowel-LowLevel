@@ -47,9 +47,6 @@ class AlgoGradient:
             eval_dernier = valeur
         return beta, omega, A, B
 
-
-
-
 def f_aperiodique(beta, alpha, A, B, t):
     return math.exp(-beta*t)*(A*math.exp(alpha*t)+B*math.exp(-alpha*t))
 def f_pseudo_periodique(beta, omega, A, B, t):
@@ -77,6 +74,7 @@ if __name__ == "__main__":
     beta, omega, A, B = modeleur.algo_descente_gradient(initialisation, nb_iter)
     T = np.linspace(0, duree, len(mesures_vitesse))
     valeur_modele = np.array([f_pseudo_periodique(beta, omega, A, B, t) for t in T])
+    ""
     plt.plot(T, valeur_modele, 'r')
     plt.plot(T, mesures_vitesse, "b")
     plt.plot(T, mesures_commande, "y")
