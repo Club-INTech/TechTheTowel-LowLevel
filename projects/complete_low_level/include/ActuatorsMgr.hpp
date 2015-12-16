@@ -19,8 +19,8 @@ extern Uart<1> serial;
 
 // on définit les différents angles utilisés pour le coté gauche et le coté droit
 //TODO valeurs à modifier
-#define fishingRightPosition 240
-#define initialRightPosition 150
+#define fishingRightPosition 0
+#define initialRightPosition 240
 #define middleRightPosition 0
 #define fingerRightInitialPosition 0
 #define fingerRightFreePosition 0
@@ -158,8 +158,8 @@ public:
 	{
 		ax12MagnetsLeft->changeSpeed(speed);
 		ax12FingerLeftFishes->changeSpeed(speed);
-		ax12MagnetsLeft->changeSpeed(speed);
-		ax12FingerLeftFishes->changeSpeed(speed);
+		ax12MagnetsRight->changeSpeed(speed);
+		ax12FingerRightFishes->changeSpeed(speed);
 	}
 };
 
