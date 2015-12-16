@@ -29,7 +29,7 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	maxSpeed = 4000; // Vitesse maximum, des moteurs (avec une marge au cas où on s'amuse à faire forcer un peu la bestiole).
 	maxSpeedTranslation = 3000;
 	maxSpeedRotation = 1500;
-	maxAcceleration = 15;
+	maxAcceleration = 8;
 
 	delayToStop = 100;
 	toleranceTranslation = 50;

@@ -210,13 +210,7 @@ int main(void)
 				}
 				asservRotation = !asservRotation;
 			}
-			else if(!strcmp("unitMove", order))
-			{
-				motionControlSystem->orderRawPwm(Side::LEFT, 90);
-				motionControlSystem->orderRawPwm(Side::RIGHT, 90);
-				Delay(500);
-				motionControlSystem->stop();
-			}
+
 			else if(!strcmp("rp",order))//Reset position
 			{
 				motionControlSystem->resetPosition();
@@ -441,45 +435,105 @@ int main(void)
 			{
 				actuatorsMgr->setAllID();
 			}
-			else if(!strcmp("testAX",order))
+
+			else if(!strcmp("fpr",order)) // Descente du bras droit aimanté (poissons)
 			{
-				actuatorsMgr->testMouvement();
+				actuatorsMgr->fishingRight();
 			}
 
-
-
-			else if(!strcmp("fp",order)) // Descente du bras aimanté (poissons)
+			else if(!strcmp("mpr",order))
 			{
-				actuatorsMgr->fishing();
+				actuatorsMgr->midPositionRight();
 			}
 
-			else if(!strcmp("mp",order))
+			else if(!strcmp("ffr",order))
 			{
-				actuatorsMgr->midPosition();
+				actuatorsMgr->freeRightFishes();
+
+			}
+			else if(!strcmp("fpl",order)) // Descente du bras gauche aimanté (poissons)
+			{
+				actuatorsMgr->fishingLeft();
 			}
 
-			else if(!strcmp("ff",order))
+			else if(!strcmp("mpl",order))
 			{
-				actuatorsMgr->freefishes();
+				actuatorsMgr->midPositionLeft();
 			}
 
-			else if(!strcmp("e", order)) // permet de tester manuellement les positions des AX12
+			else if(!strcmp("ffl",order))
+			{
+				actuatorsMgr->freeLeftFishes();
+			}
+
+			else if(!strcmp("emr", order)) // permet de tester manuellement les positions des AX12
 			{
 				int position = 150;
 				serial.printfln("Entrez angle");
 				serial.read(position);
 				serial.printfln("angle = %d", position);
 				if(position >= 0 && position <= 300)
-					actuatorsMgr->setAXpos(position);
+					actuatorsMgr->setAXposMagnetsRight(position);
 				serial.printfln("done.");
 
 			}
 
+			else if(!strcmp("efr", order)) // permet de tester manuellement les positions des AX12
+			{
+				int position = 150;
+				serial.printfln("Entrez angle");
+				serial.read(position);
+				serial.printfln("angle = %d", position);
+				if(position >= 0 && position <= 300)
+					actuatorsMgr->setAXposFreeRightFishes(position);
+				serial.printfln("done.");
+
+			}
+
+			else if(!strcmp("eml", order)) // permet de tester manuellement les positions des AX12
+			{
+				int position = 150;
+				serial.printfln("Entrez angle");
+				serial.read(position);
+				serial.printfln("angle = %d", position);
+				if(position >= 0 && position <= 300)
+					actuatorsMgr->setAXposMagnetsLeft(position);
+				serial.printfln("done.");
+
+			}
+
+			else if(!strcmp("efl", order)) // permet de tester manuellement les positions des AX12
+			{
+				int position = 150;
+				serial.printfln("Entrez angle");
+				serial.read(position);
+				serial.printfln("angle = %d", position);
+				if(position >= 0 && position <= 300)
+					actuatorsMgr->setAXposFreeLeftFishes(position);
+				serial.printfln("done.");
+
+			}
+
+			else if(!strcmp("aif", order)) {
+				actuatorsMgr->initialPositionFish();
+			}
+
+			else if(!strcmp("caxs", order)) {
+				int speed = 100;
+				serial.printfln("Entrez vitesse");
+				serial.read(speed);
+				actuatorsMgr->changeAXSpeed(speed);
+				serial.printfln("Done");
+			}
+
+
+			// Sinon, Ordre inconnu
 
 			else
 			{
 				serial.printfln("Ordre inconnu");
 			}
+
 		}
 #if DEBUG
 		else if(tailleBuffer == RX_BUFFER_SIZE - 1)
