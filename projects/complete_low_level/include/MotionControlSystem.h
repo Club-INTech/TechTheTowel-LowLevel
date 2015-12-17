@@ -132,7 +132,6 @@ private:
 
 	// Variables de réglage de la détection de blocage physique
 	unsigned int delayToStop;//En ms
-	int nullSpeed; // Vitesse en dessous de laquelle on considère un moteur comme arrêté
 
 	//Nombre de ticks de tolérance pour considérer qu'on est arrivé à destination
 	int toleranceTranslation;
