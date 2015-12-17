@@ -518,11 +518,11 @@ int main(void)
 				actuatorsMgr->initialPositionFish();
 			}
 
-			else if(!strcmp("caxs", order)) {
+			else if(!strcmp("caxs", order)) { //commande de debug
 				int speed = 100;
 				serial.printfln("Entrez vitesse");
 				serial.read(speed);
-				actuatorsMgr->changeAXSpeed(speed);
+				changeSpeedB(speed);
 				serial.printfln("Done");
 			}
 

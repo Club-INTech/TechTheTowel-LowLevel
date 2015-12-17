@@ -15,10 +15,14 @@ extern Uart<1> serial;
 #define position1 100
 #define position2 200
 
+// vitesse des AX12
+
+#define slowSpeed 14
+#define fastSpeed 25
 
 
 // on définit les différents angles utilisés pour le coté gauche et le coté droit
-//TODO valeurs à modifier
+
 #define fishingRightPosition 145
 #define initialRightPosition 230
 #define middleRightPosition 200
@@ -28,7 +32,7 @@ extern Uart<1> serial;
 
 
 // Coté gauche
-#define fishingLeftPosition 155
+#define fishingLeftPosition 160
 #define initialLeftPosition 70
 #define middleLeftPosition 100
 #define fingerLeftInitialPosition 50
@@ -97,47 +101,63 @@ public:
 
 
 	void fishingRight() {
+		ax12MagnetsRight->changeSpeed(slowSpeed);
 		ax12MagnetsRight->goTo(fishingRightPosition);
 	}
 
 	void fishingLeft() {
+		ax12MagnetsLeft->changeSpeed(slowSpeed);
 		ax12MagnetsLeft->goTo(fishingLeftPosition);
 	}
 
 	void midPositionRight() {
+		ax12MagnetsRight->changeSpeed(slowSpeed);
 		ax12MagnetsRight->goTo(middleRightPosition);
 	}
 
 	void midPositionLeft() {
+		ax12MagnetsLeft->changeSpeed(slowSpeed);
 		ax12MagnetsLeft->goTo(middleLeftPosition);
 	}
 
 	void freeRightFishes() {
+		ax12MagnetsRight->changeSpeed(slowSpeed);
 		ax12MagnetsRight->goTo(passingRightPosition);
 		Delay(500);
+		ax12FingerRightFishes->changeSpeed(fastSpeed);
 		ax12FingerRightFishes->goTo(fingerRightFreePosition);
-		Delay(500);
+		Delay(900);						//900 pour laisser le temps au doigt de descendre completement (impossible sinon si vitesse ax12 lente)
+		ax12MagnetsRight->changeSpeed(fastSpeed);
 		ax12MagnetsRight->goTo(initialRightPosition);
 		Delay(500);
+		ax12FingerRightFishes->changeSpeed(fastSpeed);
 		ax12FingerRightFishes->goTo(fingerRightInitialPosition);
 		Delay(500);
 	}
 
 	void freeLeftFishes() {
+		ax12MagnetsLeft->changeSpeed(slowSpeed);
 		ax12MagnetsLeft->goTo(passingLeftPosition);
 		Delay(500);
+		ax12FingerLeftFishes->changeSpeed(fastSpeed);
 		ax12FingerLeftFishes->goTo(fingerLeftFreePosition);
-		Delay(500);
+		Delay(900);     //900 pour laisser le temps au doigt de descendre completement (impossible sinon si vitesse ax12 lente)
+		ax12MagnetsLeft->changeSpeed(fastSpeed);
 		ax12MagnetsLeft->goTo(initialLeftPosition);
 		Delay(500);
+		ax12FingerLeftFishes->changeSpeed(fastSpeed);
 		ax12FingerLeftFishes->goTo(fingerLeftInitialPosition);
 		Delay(500);
 	}
 
 	void initialPositionFish() { //pour remettre AX12 dans leurs positions initiales
+		ax12MagnetsLeft->changeSpeed(fastSpeed);
 		ax12MagnetsLeft->goTo(initialLeftPosition);
+		ax12MagnetsRight->changeSpeed(fastSpeed);
 		ax12MagnetsRight->goTo(initialRightPosition);
+		ax12FingerLeftFishes->changeSpeed(fastSpeed);
 		ax12FingerLeftFishes->goTo(fingerLeftInitialPosition);
+		ax12FingerRightFishes->changeSpeed(fastSpeed);
 		ax12FingerRightFishes->goTo(fingerRightInitialPosition);
 	}
 
