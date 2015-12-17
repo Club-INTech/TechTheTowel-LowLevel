@@ -32,6 +32,7 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	maxAcceleration = 8;
 
 	delayToStop = 100;
+	nullSpeed = 3;
 	toleranceTranslation = 50;
 	toleranceRotation = 25;
 
@@ -219,7 +220,7 @@ void MotionControlSystem::control()
 }
 
 bool MotionControlSystem::isPhysicallyStopped() {
-	return (currentLeftSpeed == 0) && (currentRightSpeed == 0);
+	return (currentLeftSpeed <= nullSpeed) && (currentRightSpeed <= nullSpeed);
 }
 
 void MotionControlSystem::manageStop()
