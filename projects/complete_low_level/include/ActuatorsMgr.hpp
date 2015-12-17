@@ -19,21 +19,21 @@ extern Uart<1> serial;
 
 // on définit les différents angles utilisés pour le coté gauche et le coté droit
 //TODO valeurs à modifier
-#define fishingRightPosition 0
-#define initialRightPosition 240
-#define middleRightPosition 0
-#define fingerRightInitialPosition 0
-#define fingerRightFreePosition 0
-#define passingRightPosition 0
+#define fishingRightPosition 145
+#define initialRightPosition 230
+#define middleRightPosition 200
+#define fingerRightInitialPosition 150
+#define fingerRightFreePosition 50
+#define passingRightPosition 155        // position du bras au dessus du filet pour libérer les poiscailles
 
 
 // Coté gauche
 #define fishingLeftPosition 155
-#define initialLeftPosition 80
-#define middleLeftPosition 130
-#define fingerLeftInitialPosition 100
-#define fingerLeftFreePosition 45
-#define passingLeftPosition 100
+#define initialLeftPosition 70
+#define middleLeftPosition 100
+#define fingerLeftInitialPosition 50
+#define fingerLeftFreePosition 160
+#define passingLeftPosition 145
 
 class ActuatorsMgr : public Singleton<ActuatorsMgr>
 {
