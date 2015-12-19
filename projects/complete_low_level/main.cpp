@@ -14,7 +14,7 @@ int main(void)
 	serial.init(115200);
 	serial_ax.init(9600);
 
-	MotionControlSystem* motionControlSystem = &MotionControlSystem::Instance();
+	MotionControlSystem* motionControlSystem = &MotionControlSystem::Instance(); // motionControlSystem est tout simplement un pointeur vers une référence d'un objet de type MotionControlSystem #TRIVIAL #USELESS
 	motionControlSystem->init();
 	ActuatorsMgr* actuatorsMgr = &ActuatorsMgr::Instance();
 	SensorMgr* sensorMgr = &SensorMgr::Instance();
@@ -159,7 +159,6 @@ int main(void)
 				serial.read(speedRotation);
 				serial.printfln("_");
 				motionControlSystem->setRotationSpeed(speedRotation);
-				//TODO
 			}
 
 
@@ -522,7 +521,7 @@ int main(void)
 				int speed = 100;
 				serial.printfln("Entrez vitesse");
 				serial.read(speed);
-				changeSpeedB(speed);
+				actuatorsMgr->changeAXSpeed(speed);
 				serial.printfln("Done");
 			}
 

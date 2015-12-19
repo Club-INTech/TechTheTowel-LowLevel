@@ -32,7 +32,7 @@ extern Uart<1> serial;
 
 
 // Coté gauche
-#define fishingLeftPosition 160
+#define fishingLeftPosition 160 //valeur peu êter un peu élevé
 #define initialLeftPosition 70
 #define middleLeftPosition 100
 #define fingerLeftInitialPosition 50
@@ -151,14 +151,17 @@ public:
 	}
 
 	void initialPositionFish() { //pour remettre AX12 dans leurs positions initiales
+
 		ax12MagnetsLeft->changeSpeed(fastSpeed);
 		ax12MagnetsLeft->goTo(initialLeftPosition);
 		ax12MagnetsRight->changeSpeed(fastSpeed);
 		ax12MagnetsRight->goTo(initialRightPosition);
+		Delay(800);
 		ax12FingerLeftFishes->changeSpeed(fastSpeed);
 		ax12FingerLeftFishes->goTo(fingerLeftInitialPosition);
 		ax12FingerRightFishes->changeSpeed(fastSpeed);
 		ax12FingerRightFishes->goTo(fingerRightInitialPosition);
+
 	}
 
 	void setAXposMagnetsRight(int position) { // pour définir manuellement 1 position
@@ -174,12 +177,10 @@ public:
 		ax12FingerLeftFishes->goTo(position);
 	}
 
-	void changeAXSpeed(int speed)
+	void changeAXSpeed(int speed) //fonction inutile faire changeSpeedB(speed)
 	{
-		ax12MagnetsLeft->changeSpeed(speed);
-		ax12FingerLeftFishes->changeSpeed(speed);
-		ax12MagnetsRight->changeSpeed(speed);
-		ax12FingerRightFishes->changeSpeed(speed);
+		ax12MagnetsLeft->changeSpeedB(speed);
+
 	}
 };
 
