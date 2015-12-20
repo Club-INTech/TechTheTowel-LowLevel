@@ -43,7 +43,7 @@ while(m!='exit'):
     
     m=raw_input("ordre : ")
     serialCom.parler(com, m)
-    if(m=="testSpeed" or m=="testSpeedReverse"):
+    if(m=="testSpeed"):
 
         speedG=[]
         speedD=[]

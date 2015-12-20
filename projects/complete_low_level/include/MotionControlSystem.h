@@ -47,6 +47,9 @@ public:
 		ANTITRIGO	// On doit tourner vers la gauche
 	};
 
+	volatile int32_t distanceTest;
+
+
 
 private:
 	Motor leftMotor;
@@ -101,8 +104,8 @@ private:
 	Average<int32_t, AVERAGE_SPEED_SIZE> averageLeftSpeed;
 	Average<int32_t, AVERAGE_SPEED_SIZE> averageRightSpeed;
 
-	// Définit la vitesse à utiliser pour les tests d'asservissement (testSpeed et testSpeedReverse)
-	volatile int32_t speedTest;
+
+
 
 
 /*

@@ -40,7 +40,8 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	leftSpeedPID.setTunings(0.01, 0.00005, 0.01);
 	rightSpeedPID.setTunings(0.01, 0.00005, 0.01);
 
-	speedTest = 1000;
+	distanceTest = 100;
+
 }
 
 void MotionControlSystem::init() {
@@ -460,10 +461,6 @@ void MotionControlSystem::resetTracking()
 	trackerCursor = 0;
 }
 
-void MotionControlSystem::setTestSpeed(int32_t speed) // set la valeur de la vitesse de test
-{
-	speedTest=speed;
-}
 
 
 void MotionControlSystem::testSpeed()
@@ -474,10 +471,7 @@ void MotionControlSystem::testSpeed()
 	rightSpeedControlled = true;
 
 	resetTracking();
-	translationSpeed = speedTest;
-	rotationSpeed = 0;
-	Delay(1000);
-	translationSpeed = 0;
+	orderTranslation(distanceTest);
 	printTracking();
 	serial.printf("endtest");
 }
@@ -496,22 +490,6 @@ void MotionControlSystem::testPosition()
 	printPosition();
 	serial.printf("endtest");
 
-}
-
-void MotionControlSystem::testSpeedReverse()
-{
-	translationControlled = false;
-	rotationControlled = false;
-	leftSpeedControlled = true;
-	rightSpeedControlled = true;
-
-	resetTracking();
-	translationSpeed = (-1)*speedTest;
-	rotationSpeed = 0;
-	Delay(1000);
-	translationSpeed = 0;
-	printTracking();
-	serial.printf("endtest");
 }
 
 void MotionControlSystem::longTestSpeed()

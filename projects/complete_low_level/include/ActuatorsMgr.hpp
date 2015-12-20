@@ -120,35 +120,47 @@ public:
 		ax12MagnetsLeft->goTo(middleLeftPosition);
 	}
 
-	void freeRightFishes() {
+
+	// FREE FKING FISHES
+
+
+	void rightMagnetsDown() {
 		ax12MagnetsRight->changeSpeed(slowSpeed);
 		ax12MagnetsRight->goTo(passingRightPosition);
-		Delay(500);
+	}
+	void rightFingerDown(){
 		ax12FingerRightFishes->changeSpeed(fastSpeed);
 		ax12FingerRightFishes->goTo(fingerRightFreePosition);
-		Delay(900);						//900 pour laisser le temps au doigt de descendre completement (impossible sinon si vitesse ax12 lente)
+	}
+	void rightMagnetsUp(){
 		ax12MagnetsRight->changeSpeed(fastSpeed);
 		ax12MagnetsRight->goTo(initialRightPosition);
-		Delay(500);
+	}
+	void rightFingerUp(){
 		ax12FingerRightFishes->changeSpeed(fastSpeed);
 		ax12FingerRightFishes->goTo(fingerRightInitialPosition);
-		Delay(500);
 	}
 
-	void freeLeftFishes() {
+	void leftMagnetsDown() {
 		ax12MagnetsLeft->changeSpeed(slowSpeed);
 		ax12MagnetsLeft->goTo(passingLeftPosition);
-		Delay(500);
+	}
+	void leftFingerDown(){
 		ax12FingerLeftFishes->changeSpeed(fastSpeed);
 		ax12FingerLeftFishes->goTo(fingerLeftFreePosition);
-		Delay(900);     //900 pour laisser le temps au doigt de descendre completement (impossible sinon si vitesse ax12 lente)
+	}
+	void leftMagnetsUp(){
 		ax12MagnetsLeft->changeSpeed(fastSpeed);
 		ax12MagnetsLeft->goTo(initialLeftPosition);
-		Delay(500);
+	}
+	void leftFingerUp(){
 		ax12FingerLeftFishes->changeSpeed(fastSpeed);
 		ax12FingerLeftFishes->goTo(fingerLeftInitialPosition);
-		Delay(500);
 	}
+
+
+	// Voilà.
+
 
 	void initialPositionFish() { //pour remettre AX12 dans leurs positions initiales
 

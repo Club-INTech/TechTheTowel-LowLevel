@@ -216,21 +216,17 @@ int main(void)
 				serial.printfln("Reset position");
 			}
 
-			else if(!strcmp("setTestSpeed", order))
-			{
-				int32_t speed = 1000;
-				serial.printfln("Vitesse :");
-				serial.read(speed);
-				motionControlSystem->setTestSpeed(speed);
-				serial.printfln("Vitesse changée.");
-			}
+
 			else if(!strcmp("testSpeed",order))//Reset position
 			{
 				motionControlSystem->testSpeed();
 			}
-			else if(!strcmp("testSpeedReverse",order))//Reset position
+			else if(!strcmp("dtest",order))//Reset position
 			{
-				motionControlSystem->testSpeedReverse();
+				int distance = 0;
+				serial.printfln("Distance du test : (mm)");
+				serial.read(distance);
+				motionControlSystem->distanceTest = distance;
 			}
 
 			else if(!strcmp("continualTest",order))//Test long
@@ -445,11 +441,33 @@ int main(void)
 				actuatorsMgr->midPositionRight();
 			}
 
-			else if(!strcmp("ffr",order))
+
+			else if(!strcmp("rmd",order)) // rightMagnetsDown
 			{
-				actuatorsMgr->freeRightFishes();
+				actuatorsMgr->rightMagnetsDown();
 
 			}
+			else if(!strcmp("rfd",order))	// rightFingerDown
+			{
+				actuatorsMgr->rightFingerDown();
+
+			}
+			else if(!strcmp("rmu",order))	//rightMagnetsUp
+			{
+				actuatorsMgr->rightMagnetsUp();
+
+			}
+			else if(!strcmp("rfu",order))	//rightFingerUp
+			{
+				actuatorsMgr->rightFingerUp();
+
+			}
+
+
+
+
+
+
 			else if(!strcmp("fpl",order)) // Descente du bras gauche aimanté (poissons)
 			{
 				actuatorsMgr->fishingLeft();
@@ -460,9 +478,25 @@ int main(void)
 				actuatorsMgr->midPositionLeft();
 			}
 
-			else if(!strcmp("ffl",order))
+			else if(!strcmp("lmd",order)) // leftMagnetsDown
 			{
-				actuatorsMgr->freeLeftFishes();
+				actuatorsMgr->leftMagnetsDown();
+
+			}
+			else if(!strcmp("lfd",order))	// leftFingerDown
+			{
+				actuatorsMgr->leftFingerDown();
+
+			}
+			else if(!strcmp("lmu",order))	//leftMagnetsUp
+			{
+				actuatorsMgr->leftMagnetsUp();
+
+			}
+			else if(!strcmp("lfu",order))	//leftFingerUp
+			{
+				actuatorsMgr->leftFingerUp();
+
 			}
 
 			else if(!strcmp("emr", order)) // permet de tester manuellement les positions des AX12

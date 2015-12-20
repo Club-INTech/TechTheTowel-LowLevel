@@ -21,8 +21,6 @@ PWM max en translation = 100
 PWM max en rotation = 100
 Les constantes d'asservissement sont celles les plus adaptées aux PWM max (cf liste des constantes d'asservissement)
 Les AX12 des actionneurs sont tous asservis à la position qu'ils avaient à leur allumage.
-L'ascenseur du monte-plot est asservi en position 'sol'
-(il peut évetuellement se trouver ailleurs à l'allumage mais retournera au niveau du sol dès pression sur l'un de ses contacteurs)
 
 
  *************************************
@@ -49,7 +47,7 @@ Taille du buffer de réception : 64 octets
 
 
  *************************
- Protocol de communication
+ Protocole de communication
  ************************* 
 
 Il s'agit d'une architecture client-serveur avec accusé de réception.
@@ -83,23 +81,23 @@ Le haut niveau (raspberry Pi ou PC) est le client, le bas niveau (stm32f4) est l
 
 requête		traduction de la réponse									typage
 
-?xyo		[ligne1] composante x de la position en mm					float
+?xyo		[ligne1] composante x de la position en mm						float
 			[ligne2] composante y de la position en mm					folat
 			[ligne3] orientation du robot en radians					float
 
-f			[ligne1] le robot est-il en train de se déplacer ?			boolean
-			[ligne2] l'état précédement indiqué est-il normal ?			boolean
+f			[ligne1] le robot est-il en train de se déplacer ?				boolean
+			[ligne2] l'état précédement indiqué est-il normal ?				boolean
 			
-j			le jumper est-il SORTI ?									boolean
+j			le jumper est-il SORTI ?							boolean
 
 ccg			le porte-gobelet gauche est-il PLEIN ?						boolean
 ccd			le porte-gobelet droit est-il PLEIN ?						boolean
-ccm			le monte-plot CONTIENT-il un plot ?							boolean
+ccm			le monte-plot CONTIENT-il un plot ?						boolean
 
-us_av		[ligne1] distance mesurée par le capteur avant gauche (mm)	integer
-			[ligne2] distance mesurée par le capteur avant droit (mm)	integer
-us_ar		[ligne1] distance mesurée par le capteur arrière gauche(mm)	integer
-			[ligne2] distance mesurée par le capteur arrière droit (mm) integer
+us_av		[ligne1] distance mesurée par le capteur avant gauche (mm)				integer
+			[ligne2] distance mesurée par le capteur avant droit (mm)			integer
+us_ar		[ligne1] distance mesurée par le capteur arrière gauche(mm)				integer
+			[ligne2] distance mesurée par le capteur arrière droit (mm) 			integer
 
 
  ***********************
@@ -115,7 +113,7 @@ t		Ordonne une rotation absolue.
 t3		Ordonne une rotation relative.
 		La ligne suivante doit être un FLOTANT correspondant à l'angle de rotation voulu, en radians.
 
-stop	Ordonne un asservissement sur place.
+stop		Ordonne un asservissement sur place.
 
 ct0		Désactive l'asservissement en translation. Effet : pwmTranslation = 0 quelle que soit la consigne en translation.
 ct1		Active l'asservissement en translation.
@@ -123,7 +121,7 @@ cr0		Désactive l'asservissement en rotation. Effet : pwmRotation = 0 quelle que 
 cr1		Active l'asservissement en rotation.
 
 Commandes de réglage de la position
-Ces commandes n'ont aucun effet sur l'asservissement en position, et l'état des PWM.
+Ces commandes n'ont aucun effet sur l'asservissement en position/vitesse.
 Leur seul effet est de modifier les valeurs retournées par '?xyo' (et de les faire coïncider si possible avec les valeurs réelles !)
 La ligne suivante devra être un flotant correspondant à la valeur désirée.
 
@@ -133,7 +131,7 @@ co		Réglage de l'angle (radians)
 
 
  *********************************************
- Protocol d'arrêt du robot durant un mouvement
+ Protocole d'arrêt du robot durant un mouvement
  *********************************************
 
 Durant l'exécution d'une commande du type 'd' 't' 't3' si le robot doit être arrêté au plus vite, il est nécessaire d'exécuter l'opération suivante :
@@ -153,80 +151,27 @@ Durant l'exécution d'une commande du type 'd' 't' 't3' si le robot doit être arr
  *************************
  Commandes des actionneurs
  *************************
+Pour les cannes à pêche :
 
-Commandes des bras avant
-Un bras est dit fermé si il est en position pour maintenir un gobelet à l'intérieur du robot.
-On entend par "lentement" une vitesse permettant de ramasser un plot (ouverture) ou un gobelet (fermeture), les deux vitesses pouvant être différentes.
+	fpl	fishing position left		Positionne le bras aimanté gauche en position de pêche
+	fpr	fishing position right		Positionne le bras aimanté droit en position de pêche
 
-obd		ouvrir le bras droit
-mbd		mettre le bras droit en position mediane
-fbd		fermer le bras droit
+	mpl	middle position left		Positionne le bras gauche en posision intermédiaire pour passer les accroches du filet
+	mpr	middle position right		Positionne le bras droit en posision intermédiaire pour passer les accroches du filet
 
-obg		ouvrir le bras gauche
-mbg		mettre le bras gauche en position mediane
-fbg		fermer le bras gauche
+Phase de libération des poissons : A EXECUTER DANS CET ORDRE
 
-obdl	ouvrir le bras droit lentement
-fbdl	fermer le bras droit lentement
+	rmd	right magnets down		baisse le bras en position de lâcher des poissons
+	rfd	right finger down		baisse le doigt pour désaimanter les poiscailles
+	rmu	right magnets up		remonte le bras magnétique
+	rfu	right finger up			remonte le doigt en position initiale
+	
 
-obgl	ouvrir le bras gauche lentement
-fbgl	fermer le bras gauche lentement
-
-
-Commandes de la machoire du monte-plot
-
-omd		ouvrir la machoire droite
-fmd		fermer la machoire droite
-
-omg		ouvrir la machoire gauche
-fmg		fermer la machoire gauche
-
-
-Commandes de l'ascenseur du monte-plot
-
-ah		niveau haut
-ab		niveau bas (ou poser sur l'estrade)
-as		poser sur le sol
-ae		niveau de l'estrade (permet de passer par dessus)
-
-
-Commandes du guide à plots
-
-ogd		ouvrir le guide de droite
-fgd		fermer le guide de droite
-gdi		mettre le guide de droite en position intermédiaire
-
-ogg		ouvrir le guide de gauche
-fgg		fermer le guide de gauche
-ggi		mettre le guide de gauche en position intermédiaire (désactive l'anti-retour en continuant de maintenir la pile)
-
-go		équivalent à ogg et ogd
-gf		équivalent à fgg et fgd
-gi		équivalent à ggi et gdi
-
-
-Commandes des pose-tapis
-
-ptd		poser le tapis droit
-rtd		remonter le pose-tapis droit
-
-ptg		poser le tapis gauche
-rtg		remonter le pose-tapis gauche
-
-
-Commandes des bras à claps
-Position haute : le bars passe au dessus des claps
-Position médiane : la bras abaisse le clap
-Position basse : le bras est rangé contre le robot
-
-cdh		clap droit en position haute		
-cdm		clap droit en position médiane
-cdb		clap droit en position basse
-
-cgh		clap gauche en position haute
-cgm		clap gauche en position médiane
-cgb		clap gauche en position basse
-
+	lmd	left magnets down
+	lfd	left finger down
+	lmu	left magnets up
+	lfu	left finger up
+	
 
  **************************************************
  Protocol d'initialisation des actionneurs du robot
