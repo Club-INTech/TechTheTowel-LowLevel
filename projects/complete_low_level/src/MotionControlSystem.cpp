@@ -29,9 +29,9 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	maxSpeed = 4000; // Vitesse maximum, des moteurs (avec une marge au cas où on s'amuse à faire forcer un peu la bestiole).
 	maxSpeedTranslation = 2000; // Consigne max envoyée au PID
 	maxSpeedRotation = 1400;
-	maxAcceleration = 4000;
+	maxAcceleration = 10;
 
-	maxjerk = 10;
+	maxjerk = 1; // Valeur de jerk maxi(secousse d'accélération)
 
 	delayToStop = 100;
 	toleranceTranslation = 50;
@@ -108,6 +108,10 @@ void MotionControlSystem::control()
 	static int32_t previousLeftSpeedSetpoint = 0;
 	static int32_t previousRightSpeedSetpoint = 0;
 
+	// Pour le calcul du jerk :
+	static int32_t previousLeftAcceleration = 0;
+	static int32_t previousRightAcceleration = 0;
+
 	/*
 	 * Comptage des ticks de la roue droite
 	 * Cette codeuse est connectée à un timer 16bit
@@ -175,7 +179,7 @@ void MotionControlSystem::control()
 
 
 
-	// Limitation de la vitesses
+	// Limitation de la vitesse
 	if(leftSpeedSetpoint > maxSpeed)
 		leftSpeedSetpoint = maxSpeed;
 	else if(leftSpeedSetpoint < -maxSpeed)
@@ -206,7 +210,28 @@ void MotionControlSystem::control()
 		rightSpeedSetpoint = previousRightSpeedSetpoint - maxAcceleration;
 	}
 
+	//Limitation du jerk moteur gauche
+	if((leftSpeedSetpoint - previousLeftSpeedSetpoint) - previousLeftAcceleration > maxjerk)
+	{
+		leftSpeedSetpoint = maxjerk + previousLeftAcceleration + previousLeftSpeedSetpoint;
+	}
+	else if((leftSpeedSetpoint - previousLeftSpeedSetpoint) - previousLeftAcceleration < -maxjerk)
+	{
+		leftSpeedSetpoint = previousLeftAcceleration + previousLeftSpeedSetpoint - maxjerk;
+	}
 
+	//Limitation du jerk moteur droit
+	if((rightSpeedSetpoint - previousRightSpeedSetpoint) - previousRightAcceleration > maxjerk)
+	{
+		rightSpeedSetpoint = maxjerk + previousRightAcceleration + previousRightSpeedSetpoint;
+	}
+	else if((rightSpeedSetpoint - previousRightSpeedSetpoint) - previousRightAcceleration < -maxjerk)
+	{
+		rightSpeedSetpoint = previousRightAcceleration + previousRightSpeedSetpoint - maxjerk;
+	}
+
+	previousLeftAcceleration = leftSpeedSetpoint - previousLeftSpeedSetpoint;
+	previousRightAcceleration = rightSpeedSetpoint - previousLeftSpeedSetpoint;
 	previousLeftSpeedSetpoint = leftSpeedSetpoint;
 	previousRightSpeedSetpoint = rightSpeedSetpoint;
 
