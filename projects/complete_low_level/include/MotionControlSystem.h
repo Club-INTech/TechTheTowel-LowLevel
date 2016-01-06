@@ -26,7 +26,7 @@
 #define AVERAGE_SPEED_SIZE	25
 
 #if DEBUG
-#define TRACKER_SIZE 		1000
+#define TRACKER_SIZE 		1500
 #else
 #define TRACKER_SIZE 		1
 #endif
@@ -99,6 +99,9 @@ private:
 
 	//	Limitation d'accélération
 	volatile int32_t maxAcceleration;
+
+	// Limitation de Jerk
+	volatile int32_t maxjerk;
 
 	//	Pour faire de jolies courbes de réponse du système, la vitesse moyenne c'est mieux !
 	Average<int32_t, AVERAGE_SPEED_SIZE> averageLeftSpeed;

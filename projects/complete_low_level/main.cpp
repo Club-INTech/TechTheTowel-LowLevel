@@ -217,11 +217,11 @@ int main(void)
 			}
 
 
-			else if(!strcmp("testSpeed",order))//Reset position
+			else if(!strcmp("testSpeed",order))
 			{
 				motionControlSystem->testSpeed();
 			}
-			else if(!strcmp("dtest",order))//Reset position
+			else if(!strcmp("dtest",order))
 			{
 				int distance = 0;
 				serial.printfln("Distance du test : (mm)");

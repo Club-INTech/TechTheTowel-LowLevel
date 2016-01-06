@@ -28,7 +28,7 @@ extern Uart<1> serial;
 #define middleRightPosition 200
 #define fingerRightInitialPosition 150
 #define fingerRightFreePosition 50
-#define passingRightPosition 155        // position du bras au dessus du filet pour libérer les poiscailles
+#define passingRightPosition 165        // position du bras au dessus du filet pour libérer les poiscailles
 
 
 // Coté gauche
@@ -37,7 +37,7 @@ extern Uart<1> serial;
 #define middleLeftPosition 100
 #define fingerLeftInitialPosition 50
 #define fingerLeftFreePosition 160
-#define passingLeftPosition 145
+#define passingLeftPosition 140
 
 class ActuatorsMgr : public Singleton<ActuatorsMgr>
 {
