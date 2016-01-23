@@ -31,16 +31,16 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	maxSpeedRotation = 1400;
 	maxAcceleration = 10;
 
-	maxjerk = 1; // Valeur de jerk maxi(secousse d'accélération)
+	// maxjerk = 1; // Valeur de jerk maxi(secousse d'accélération)
 
 	delayToStop = 100;
-	toleranceTranslation = 50;
-	toleranceRotation = 25;
+	toleranceTranslation = 10;
+	toleranceRotation = 10;
 
-	translationPID.setTunings(15, 0, 10);
-	rotationPID.setTunings(16,0,10);
-	leftSpeedPID.setTunings(0.01, 0.00005, 0.01);
-	rightSpeedPID.setTunings(0.01, 0.00005, 0.01);
+	translationPID.setTunings(12, 0, 1000);
+	rotationPID.setTunings(15, 0, 1000);
+	leftSpeedPID.setTunings(0.01, 0.000025, 0);
+	rightSpeedPID.setTunings(0.01, 0.000025, 0);
 
 	distanceTest = 200;
 
@@ -108,9 +108,12 @@ void MotionControlSystem::control()
 	static int32_t previousLeftSpeedSetpoint = 0;
 	static int32_t previousRightSpeedSetpoint = 0;
 
+	/*
 	// Pour le calcul du jerk :
 	static int32_t previousLeftAcceleration = 0;
 	static int32_t previousRightAcceleration = 0;
+	*/
+
 
 	/*
 	 * Comptage des ticks de la roue droite
@@ -210,6 +213,8 @@ void MotionControlSystem::control()
 		rightSpeedSetpoint = previousRightSpeedSetpoint - maxAcceleration;
 	}
 
+	/*
+
 	//Limitation du jerk moteur gauche
 	if((leftSpeedSetpoint - previousLeftSpeedSetpoint) - previousLeftAcceleration > maxjerk)
 	{
@@ -232,6 +237,8 @@ void MotionControlSystem::control()
 
 	previousLeftAcceleration = leftSpeedSetpoint - previousLeftSpeedSetpoint;
 	previousRightAcceleration = rightSpeedSetpoint - previousLeftSpeedSetpoint;
+	*/
+
 	previousLeftSpeedSetpoint = leftSpeedSetpoint;
 	previousRightSpeedSetpoint = rightSpeedSetpoint;
 
@@ -504,13 +511,13 @@ void MotionControlSystem::testSpeed()
 	translationSpeed = 0;
 	printTracking();
 	serial.printf("endtest");
-	stop();
+	/*stop();
 	Delay(1000);
-	setTranslationSpeed(150);
+	setTranslationSpeed(maxSpeedTranslation);
 	translationControlled = true;
 	rotationControlled = true;
 	orderTranslation(-distanceTest);
-	setTranslationSpeed(maxSpeedTranslation);
+	setTranslationSpeed(maxSpeedTranslation);*/
 
 }
 
