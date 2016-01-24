@@ -20,7 +20,7 @@ public:
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-
+/*
 		GPIO_InitTypeDef GPIO_InitStruct;
 		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 
@@ -90,7 +90,7 @@ public:
 		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-		GPIO_Init(GPIOC, &GPIO_InitStruct);
+		GPIO_Init(GPIOC, &GPIO_InitStruct);*/
 
 		adc_configure();
 
@@ -110,12 +110,12 @@ private:
 	 GPIO_InitTypeDef GPIO_initStructre; //Structure for analog input pin
 	 //Clock configuration
 	 RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1,ENABLE);//The ADC1 is connected the APB2 peripheral bus thus we will use its clock source
-	 RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_GPIOCEN,ENABLE);//Clock for the ADC port!! Do not forget about this one ;)
+	 //RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_GPIOCEN,ENABLE);//Clock for the ADC port!! Do not forget about this one ;)
 	 //Analog pin configuration
-	 GPIO_initStructre.GPIO_Pin = GPIO_Pin_0;//The channel 10 is connected to PC0
+	 GPIO_initStructre.GPIO_Pin = GPIO_Pin_3;//The channel 10 is connected to PC0
 	 GPIO_initStructre.GPIO_Mode = GPIO_Mode_AN; //The PC0 pin is configured in analog mode
 	 GPIO_initStructre.GPIO_PuPd = GPIO_PuPd_NOPULL; //We don't need any pull up or pull down
-	 GPIO_Init(GPIOC,&GPIO_initStructre);//Affecting the port with the initialization structure configuration
+	 GPIO_Init(GPIOA,&GPIO_initStructre);//Affecting the port with the initialization structure configuration
 	 //ADC structure configuration
 	 ADC_DeInit();
 	 ADC_init_structure.ADC_DataAlign = ADC_DataAlign_Right;//data converted will be shifted to right
