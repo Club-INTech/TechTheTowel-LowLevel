@@ -36,7 +36,7 @@
 /**
  *Include this only if ltoa is not implemented in you standard library implementation
  */
-#include "ltoa.h"
+//#include "ltoa.h"
 
 #define RX_BUFFER_SIZE 64
 
@@ -58,7 +58,7 @@ private:
 	template<class T>
 	static inline void write(T val) {
 		char buffer[10];
-		ltoa(val, buffer, 10);
+		itoa(val, buffer, 10);
 		write((const char *) buffer);
 	}
 
