@@ -2,6 +2,7 @@
 #include "stm32f4xx.h"
 #include "safe_enum.hpp"
 #include "utils.h"
+#include "Uart.hpp"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_rcc.h"
@@ -99,8 +100,9 @@ public:
 	{
 		uint32_t ADCValue;
 		ADCValue = adc_convert();;
-
+		serial.println((int)ADCValue);
 	}
+
 private:
 
 	void adc_configure(){

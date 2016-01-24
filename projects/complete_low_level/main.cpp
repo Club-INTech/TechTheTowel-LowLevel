@@ -19,7 +19,7 @@ int main(void)
 	motionControlSystem->init();
 	ActuatorsMgr* actuatorsMgr = &ActuatorsMgr::Instance();
 	SensorMgr* sensorMgr = &SensorMgr::Instance();
-	voltage_controller* voltage = &voltage_controller::Instance();
+	//voltage_controller* voltage = &voltage_controller::Instance();
 
 	char order[64];//Permet le stockage du message reçu par la liaison série
 
@@ -588,7 +588,7 @@ extern "C" {
 void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 	volatile static uint32_t i = 0, j = 0, k = 0;
 	static MotionControlSystem* motionControlSystem = &MotionControlSystem::Instance();
-	static voltage_controller* voltage = &voltage_controller::Instance();
+	//static voltage_controller* voltage = &voltage_controller::Instance();
 
 	if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET) {
 		//Remise à 0 manuelle du flag d'interruption nécessaire
@@ -611,7 +611,7 @@ void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 
 		if(k <= 2000)
 		{
-			voltage->measure();
+			//voltage->measure();
 			k=0;
 		}
 
