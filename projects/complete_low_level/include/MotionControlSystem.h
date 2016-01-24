@@ -100,8 +100,10 @@ private:
 	//	Limitation d'accélération
 	volatile int32_t maxAcceleration;
 
+	/*
 	// Limitation de Jerk
 	volatile int32_t maxjerk;
+	*/
 
 	//	Pour faire de jolies courbes de réponse du système, la vitesse moyenne c'est mieux !
 	Average<int32_t, AVERAGE_SPEED_SIZE> averageLeftSpeed;

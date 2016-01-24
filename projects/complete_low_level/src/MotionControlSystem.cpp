@@ -29,18 +29,18 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	maxSpeed = 4000; // Vitesse maximum, des moteurs (avec une marge au cas où on s'amuse à faire forcer un peu la bestiole).
 	maxSpeedTranslation = 2000; // Consigne max envoyée au PID
 	maxSpeedRotation = 1400;
-	maxAcceleration = 4000;
+	maxAcceleration = 10;
 
-	maxjerk = 10;
+	// maxjerk = 1; // Valeur de jerk maxi(secousse d'accélération)
 
 	delayToStop = 100;
-	toleranceTranslation = 50;
-	toleranceRotation = 25;
+	toleranceTranslation = 10;
+	toleranceRotation = 10;
 
-	translationPID.setTunings(15, 0, 10);
-	rotationPID.setTunings(16,0,10);
-	leftSpeedPID.setTunings(0.01, 0.00005, 0.01);
-	rightSpeedPID.setTunings(0.01, 0.00005, 0.01);
+	translationPID.setTunings(12, 0, 1000);
+	rotationPID.setTunings(15, 0, 1000);
+	leftSpeedPID.setTunings(0.01, 0.000025, 0);
+	rightSpeedPID.setTunings(0.01, 0.000025, 0);
 
 	distanceTest = 200;
 
@@ -109,6 +109,13 @@ void MotionControlSystem::control()
 	static int32_t previousRightSpeedSetpoint = 0;
 
 	/*
+	// Pour le calcul du jerk :
+	static int32_t previousLeftAcceleration = 0;
+	static int32_t previousRightAcceleration = 0;
+	*/
+
+
+	/*
 	 * Comptage des ticks de la roue droite
 	 * Cette codeuse est connectée à un timer 16bit
 	 * on subit donc un overflow/underflow de la valeur des ticks tous les 7 mètres environ
@@ -175,7 +182,7 @@ void MotionControlSystem::control()
 
 
 
-	// Limitation de la vitesses
+	// Limitation de la vitesse
 	if(leftSpeedSetpoint > maxSpeed)
 		leftSpeedSetpoint = maxSpeed;
 	else if(leftSpeedSetpoint < -maxSpeed)
@@ -206,6 +213,31 @@ void MotionControlSystem::control()
 		rightSpeedSetpoint = previousRightSpeedSetpoint - maxAcceleration;
 	}
 
+	/*
+
+	//Limitation du jerk moteur gauche
+	if((leftSpeedSetpoint - previousLeftSpeedSetpoint) - previousLeftAcceleration > maxjerk)
+	{
+		leftSpeedSetpoint = maxjerk + previousLeftAcceleration + previousLeftSpeedSetpoint;
+	}
+	else if((leftSpeedSetpoint - previousLeftSpeedSetpoint) - previousLeftAcceleration < -maxjerk)
+	{
+		leftSpeedSetpoint = previousLeftAcceleration + previousLeftSpeedSetpoint - maxjerk;
+	}
+
+	//Limitation du jerk moteur droit
+	if((rightSpeedSetpoint - previousRightSpeedSetpoint) - previousRightAcceleration > maxjerk)
+	{
+		rightSpeedSetpoint = maxjerk + previousRightAcceleration + previousRightSpeedSetpoint;
+	}
+	else if((rightSpeedSetpoint - previousRightSpeedSetpoint) - previousRightAcceleration < -maxjerk)
+	{
+		rightSpeedSetpoint = previousRightAcceleration + previousRightSpeedSetpoint - maxjerk;
+	}
+
+	previousLeftAcceleration = leftSpeedSetpoint - previousLeftSpeedSetpoint;
+	previousRightAcceleration = rightSpeedSetpoint - previousLeftSpeedSetpoint;
+	*/
 
 	previousLeftSpeedSetpoint = leftSpeedSetpoint;
 	previousRightSpeedSetpoint = rightSpeedSetpoint;
@@ -479,13 +511,13 @@ void MotionControlSystem::testSpeed()
 	translationSpeed = 0;
 	printTracking();
 	serial.printf("endtest");
-	stop();
+	/*stop();
 	Delay(1000);
-	setTranslationSpeed(150);
+	setTranslationSpeed(maxSpeedTranslation);
 	translationControlled = true;
 	rotationControlled = true;
 	orderTranslation(-distanceTest);
-	setTranslationSpeed(maxSpeedTranslation);
+	setTranslationSpeed(maxSpeedTranslation);*/
 
 }
 
