@@ -561,7 +561,10 @@ int main(void)
 				serial.printfln("Done");
 			}
 
-
+			else if(!strcmp("uoe",order))
+			{ // test
+				serial.printfln("Une fraise");
+			}
 			// Sinon, Ordre inconnu
 
 			else
