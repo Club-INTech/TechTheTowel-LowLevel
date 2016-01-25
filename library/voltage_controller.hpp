@@ -8,9 +8,13 @@
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_usart.h"
 #include "stm32f4xx_adc.h"
+#include "MotionControlSystem.h"
 
 
-
+/**
+ * Permet de mesurer la tension de la LiPO et l'affiche sur un indicateur à 10 LEDs
+ * @author discord
+ */
 class voltage_controller : public Singleton<voltage_controller>
 {
 public:
@@ -22,13 +26,6 @@ public:
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 /*
 		GPIO_InitTypeDef GPIO_InitStruct;
-		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
-
-		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3;
-		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-		GPIO_Init(GPIOB, &GPIO_InitStruct);
-
 		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 
 		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
@@ -90,7 +87,14 @@ public:
 		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-		GPIO_Init(GPIOC, &GPIO_InitStruct);*/
+		GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
+
+		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_7;
+		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+		GPIO_Init(GPIOC, &GPIO_InitStruct)*/
 
 		adc_configure();
 
@@ -100,19 +104,88 @@ public:
 	{
 		uint32_t ADCValue;
 		ADCValue = adc_convert();;
-		serial.println((int)ADCValue);
+		serial.printfln("%d",(int)ADCValue);
+
+
+/*
+		clear_leds();
+
+		if(ADCValue >= voltage_echelon*9 + minimal_voltage )
+		{
+			GPIO_SetBits(GPIOD, GPIO_Pin_6);
+		}
+		if(ADCValue >= voltage_echelon*8 + minimal_voltage )
+		{
+			GPIO_SetBits(GPIOD, GPIO_Pin_4);
+		}
+		if(ADCValue >= voltage_echelon*7 + minimal_voltage )
+		{
+			GPIO_SetBits(GPIOD, GPIO_Pin_2);
+		}
+		if(ADCValue >= voltage_echelon*6 + minimal_voltage )
+		{
+			GPIO_SetBits(GPIOD, GPIO_Pin_0);
+		}
+		if(ADCValue >= voltage_echelon*5 + minimal_voltage )
+		{
+			GPIO_SetBits(GPIOC, GPIO_Pin_11);
+		}
+		if(ADCValue >= voltage_echelon*4 + minimal_voltage )
+		{
+			GPIO_SetBits(GPIOA, GPIO_Pin_15);
+		}
+		if(ADCValue >= voltage_echelon*3 + minimal_voltage )
+		{
+			GPIO_SetBits(GPIOA, GPIO_Pin_13);
+		}
+		if(ADCValue >= voltage_echelon*2 + minimal_voltage )
+		{
+			GPIO_SetBits(GPIOA, GPIO_Pin_9);
+		}
+		if(ADCValue >= voltage_echelon + minimal_voltage )
+		{
+			GPIO_SetBits(GPIOC, GPIO_Pin_9);
+		}
+		if(ADCValue >= minimal_voltage )
+		{
+			GPIO_SetBits(GPIOC, GPIO_Pin_7);
+		}
+		if(ADCValue < minimal_voltage )
+		{
+			counter++;
+			if(counter >= 10) // On utilise un compteur pour éviter un blocage en cas de mauvaise lecture exceptionnelle
+			{
+				static MotionControlSystem* motionControlSystem = &MotionControlSystem::Instance();
+				motionControlSystem->stop();
+				while(true)
+				{
+					GPIO_SetBits(GPIOC, GPIO_Pin_7);
+					Delay(500);
+					GPIO_ResetBits(GPIOC, GPIO_Pin_7);
+					Delay(500);
+				}
+			}
+		} else {
+			counter = 0;
+		}*/
+
 	}
 
 private:
+
+	uint32_t voltage_echelon = 200; //Cherches pas, y'a pas d'unité SI.
+	uint32_t minimal_voltage = 200; //Là non plus.
+	int counter = 0; //Là t'es con si t'en cherches une...
+
 
 	void adc_configure(){
 	 ADC_InitTypeDef ADC_init_structure; //Structure for adc confguration
 	 GPIO_InitTypeDef GPIO_initStructre; //Structure for analog input pin
 	 //Clock configuration
-	 RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1,ENABLE);//The ADC1 is connected the APB2 peripheral bus thus we will use its clock source
+	 RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC3,ENABLE);//The ADC1 is connected the APB2 peripheral bus thus we will use its clock source
 	 //RCC_AHB1PeriphClockCmd(RCC_AHB1ENR_GPIOCEN,ENABLE);//Clock for the ADC port!! Do not forget about this one ;)
 	 //Analog pin configuration
-	 GPIO_initStructre.GPIO_Pin = GPIO_Pin_3;//The channel 10 is connected to PC0
+	 GPIO_initStructre.GPIO_Pin = GPIO_Pin_3;//	The channel 10 is connected to PC0
 	 GPIO_initStructre.GPIO_Mode = GPIO_Mode_AN; //The PC0 pin is configured in analog mode
 	 GPIO_initStructre.GPIO_PuPd = GPIO_PuPd_NOPULL; //We don't need any pull up or pull down
 	 GPIO_Init(GPIOA,&GPIO_initStructre);//Affecting the port with the initialization structure configuration
@@ -125,17 +198,31 @@ private:
 	 ADC_init_structure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;//no trigger for conversion
 	 ADC_init_structure.ADC_NbrOfConversion = 1;//I think this one is clear :p
 	 ADC_init_structure.ADC_ScanConvMode = DISABLE;//The scan is configured in one channel
-	 ADC_Init(ADC1,&ADC_init_structure);//Initialize ADC with the previous configuration
+	 ADC_Init(ADC3,&ADC_init_structure);//Initialize ADC with the previous configuration
 	 //Enable ADC conversion
-	 ADC_Cmd(ADC1,ENABLE);
+	 ADC_Cmd(ADC3,ENABLE);
 	 //Select the channel to be read from
-	 ADC_RegularChannelConfig(ADC1,ADC_Channel_10,1,ADC_SampleTime_144Cycles);
+	 ADC_RegularChannelConfig(ADC3,ADC_Channel_3,1,ADC_SampleTime_144Cycles);
+	}
+
+	void clear_leds()
+	{
+		GPIO_ResetBits(GPIOD, GPIO_Pin_6);
+		GPIO_ResetBits(GPIOD, GPIO_Pin_4);
+		GPIO_ResetBits(GPIOD, GPIO_Pin_2);
+		GPIO_ResetBits(GPIOD, GPIO_Pin_0);
+		GPIO_ResetBits(GPIOC, GPIO_Pin_11);
+		GPIO_ResetBits(GPIOA, GPIO_Pin_15);
+		GPIO_ResetBits(GPIOA, GPIO_Pin_13);
+		GPIO_ResetBits(GPIOA, GPIO_Pin_9);
+		GPIO_ResetBits(GPIOC, GPIO_Pin_9);
+		GPIO_ResetBits(GPIOC, GPIO_Pin_7);
 	}
 
 
 	int adc_convert(){
-	 ADC_SoftwareStartConv(ADC1);//Start the conversion
-	 while(!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC));//Processing the conversion
-	 return ADC_GetConversionValue(ADC1); //Return the converted data
+	 ADC_SoftwareStartConv(ADC3);//Start the conversion
+	 while(!ADC_GetFlagStatus(ADC3, ADC_FLAG_EOC));//Processing the conversion
+	 return ADC_GetConversionValue(ADC3); //Return the converted data
 	}
 };
