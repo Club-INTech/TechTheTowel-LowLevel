@@ -24,7 +24,7 @@ public:
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-/*
+/* TODO a decommenter une fois la carte installée
 		GPIO_InitTypeDef GPIO_InitStruct;
 		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 
@@ -104,10 +104,7 @@ public:
 	{
 		uint32_t ADCValue;
 		ADCValue = adc_convert();;
-		serial.printfln("%d",(int)ADCValue);
 
-
-/*
 		clear_leds();
 
 		if(ADCValue >= voltage_echelon*9 + minimal_voltage )
@@ -167,14 +164,14 @@ public:
 			}
 		} else {
 			counter = 0;
-		}*/
+		}
 
 	}
 
 private:
 
-	uint32_t voltage_echelon = 200; //Cherches pas, y'a pas d'unité SI.
-	uint32_t minimal_voltage = 200; //Là non plus.
+	uint32_t voltage_echelon = 50; //Cherches pas, y'a pas d'unité SI.
+	uint32_t minimal_voltage = 3100; //Là non plus.
 	int counter = 0; //Là t'es con si t'en cherches une...
 
 
