@@ -154,13 +154,15 @@ public:
 			{
 				static MotionControlSystem* motionControlSystem = &MotionControlSystem::Instance();
 				motionControlSystem->stop();
-				while(true)
+				if(blink)
 				{
 					GPIO_SetBits(GPIOC, GPIO_Pin_7);
-					Delay(500);
-					GPIO_ResetBits(GPIOC, GPIO_Pin_7);
-					Delay(500);
 				}
+				else
+				{
+					GPIO_ResetBits(GPIOC, GPIO_Pin_7);
+				}
+				blink = !blink;
 			}
 		} else {
 			counter = 0;
@@ -173,6 +175,7 @@ private:
 	uint32_t voltage_echelon = 50; //Cherches pas, y'a pas d'unité SI.
 	uint32_t minimal_voltage = 3100; //Là non plus.
 	int counter = 0; //Là t'es con si t'en cherches une...
+	boolean blink = false;
 
 
 	void adc_configure(){
