@@ -614,7 +614,7 @@ void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 
 		if(k <= 2000)
 		{
-			//voltage->measure();
+			voltage->measure();
 			k=0;
 		}
 
