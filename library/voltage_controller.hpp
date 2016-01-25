@@ -24,7 +24,7 @@ public:
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-/* TODO a decommenter une fois la carte installée
+
 		GPIO_InitTypeDef GPIO_InitStruct;
 		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 
@@ -94,7 +94,7 @@ public:
 		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_7;
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-		GPIO_Init(GPIOC, &GPIO_InitStruct)*/
+		GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 		adc_configure();
 
@@ -103,7 +103,8 @@ public:
 	void measure()
 	{
 		uint32_t ADCValue;
-		ADCValue = adc_convert();;
+		ADCValue = adc_convert();
+		//serial.printfln("%d",(int)ADCValue);
 
 		clear_leds();
 
@@ -154,13 +155,15 @@ public:
 			{
 				static MotionControlSystem* motionControlSystem = &MotionControlSystem::Instance();
 				motionControlSystem->stop();
-				while(true)
+				if(blink)
 				{
 					GPIO_SetBits(GPIOC, GPIO_Pin_7);
-					Delay(500);
-					GPIO_ResetBits(GPIOC, GPIO_Pin_7);
-					Delay(500);
 				}
+				else
+				{
+					GPIO_ResetBits(GPIOC, GPIO_Pin_7);
+				}
+				blink = !blink;
 			}
 		} else {
 			counter = 0;
@@ -173,6 +176,7 @@ private:
 	uint32_t voltage_echelon = 50; //Cherches pas, y'a pas d'unité SI.
 	uint32_t minimal_voltage = 3100; //Là non plus.
 	int counter = 0; //Là t'es con si t'en cherches une...
+	bool blink = false;
 
 
 	void adc_configure(){
