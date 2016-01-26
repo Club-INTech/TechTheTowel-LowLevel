@@ -116,6 +116,8 @@ private:
 /*
  * 	Variables de positionnement haut niveau (exprimmées en unités pratiques ^^)
  *
+ *	Pingu <3
+ *
  * 	Toutes ces variables sont initialisées à 0. Elles doivent donc être règlées ensuite
  * 	par le haut niveau pour correspondre à son système de coordonnées.
  * 	Le bas niveau met à jour la valeur de ces variables mais ne les utilise jamais pour
