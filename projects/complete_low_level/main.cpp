@@ -158,7 +158,7 @@ int main(void)
 			}
 			else if(!strcmp("crv",order))  //Régler la vitesse de rotation
 			{
-				float speedRotation = 0;
+				float speedRotation = 0; // rad/s
 				serial.read(speedRotation);
 				serial.printfln("_");
 				motionControlSystem->setRotationSpeed(speedRotation);
@@ -616,6 +616,7 @@ int main(void)
 			{ // test
 				serial.printfln("Une fraise");
 			}
+
 			// Sinon, Ordre inconnu
 
 			else
