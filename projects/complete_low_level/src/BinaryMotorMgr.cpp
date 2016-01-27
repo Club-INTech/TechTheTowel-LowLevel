@@ -5,7 +5,7 @@
  *
  */
 
-#include "BinaryMotorMgr.h"
+#include "BinaryMotorMgr.hpp"
 
 BinaryMotorMgr::BinaryMotorMgr() {
 
@@ -15,6 +15,9 @@ BinaryMotorMgr::BinaryMotorMgr() {
 		 * Porte gauche fermeture : PE11
 		 * Porte Droite ouverture : PE13
 		 * Porte droite fermeture : PE15
+		 *
+		 * Axe gauche : PE5
+		 * Axe droit : PE3
 		 *
 		 */
 
@@ -27,59 +30,81 @@ BinaryMotorMgr::BinaryMotorMgr() {
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
 			GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-			GPIO_Init(GPIOD, &GPIO_InitStruct);
+			GPIO_Init(GPIOE, &GPIO_InitStruct);
 
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_11;
 			GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-			GPIO_Init(GPIOD, &GPIO_InitStruct);
+			GPIO_Init(GPIOE, &GPIO_InitStruct);
 
 
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_13;
 			GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-			GPIO_Init(GPIOD, &GPIO_InitStruct);
+			GPIO_Init(GPIOE, &GPIO_InitStruct);
 
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_15;
 			GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-			GPIO_Init(GPIOD, &GPIO_InitStruct);
+			GPIO_Init(GPIOE, &GPIO_InitStruct);
 
+			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3;
+			GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+			GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
+			GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+			GPIO_Init(GPIOE, &GPIO_InitStruct);
 
 
 
 }
 
-void BinaryMotorMgr::run(Direction dir, Side side) {
-	if (side == Side::LEFT) {
-		if (dir == Direction::FORWARD) {
-			GPIO_SetBits(GPIOD, GPIO_Pin_9);
-		} else {
-			GPIO_SetBits(GPIOD, GPIO_Pin_11);
-		}
-	} else {
-		if (dir == Direction::FORWARD) {
-			GPIO_SetBits(GPIOD, GPIO_Pin_13);
+/*--- Axes rotatifs ---*/
 
-		} else {
-			GPIO_SetBits(GPIOD, GPIO_Pin_15);
-		}
+void BinaryMotorMgr::runAxisLeft() {
+	GPIO_SetBits(GPIOE, GPIO_Pin_5);
 	}
+
+void BinaryMotorMgr::runAxisRight() {
+	GPIO_SetBits(GPIOE, GPIO_Pin_3);
+	}
+
+void BinaryMotorMgr::stopAxisLeft() {
+	GPIO_ResetBits(GPIOE, GPIO_Pin_5);
+	}
+
+void BinaryMotorMgr::stopAxisRight() {
+	GPIO_ResetBits(GPIOE, GPIO_Pin_3);
+	}
+
+
+/*--- Mouvement des portes ---*/
+
+void BinaryMotorMgr::runForwardLeft() {
+	GPIO_SetBits(GPIOE, GPIO_Pin_9);
 }
 
-void BinaryMotorMgr::stop(Direction dir, Side side) {
-	if (side == Side::LEFT) {
-		if (dir == Direction::FORWARD) {
-			GPIO_ResetBits(GPIOD, GPIO_Pin_9);
-		} else {
-			GPIO_ResetBits(GPIOD, GPIO_Pin_11);
-		}
-	} else {
-		if (dir == Direction::FORWARD) {
-			GPIO_ResetBits(GPIOD, GPIO_Pin_13);
+void BinaryMotorMgr::runBackwardLeft() {
+	GPIO_SetBits(GPIOE, GPIO_Pin_11);
+}
 
-		} else {
-			GPIO_ResetBits(GPIOD, GPIO_Pin_15);
-		}
-	}
+void BinaryMotorMgr::runForwardRight() {
+	GPIO_SetBits(GPIOE, GPIO_Pin_13);
+}
+
+void BinaryMotorMgr::runBackwardRight() {
+	GPIO_SetBits(GPIOE, GPIO_Pin_15);
+}
+
+void BinaryMotorMgr::stopLeftDoor() {
+	GPIO_ResetBits(GPIOE, GPIO_Pin_9);
+	GPIO_ResetBits(GPIOE, GPIO_Pin_11);
+}
+
+void BinaryMotorMgr::stopRightDoor() {
+	GPIO_ResetBits(GPIOE, GPIO_Pin_13);
+	GPIO_ResetBits(GPIOE, GPIO_Pin_15);
 }

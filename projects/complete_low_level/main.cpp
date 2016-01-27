@@ -4,7 +4,7 @@
 #include "ActuatorsMgr.hpp"
 #include "SensorMgr.h"
 #include "voltage_controller.hpp"
-
+#include "BinaryMotorMgr.hpp"
 
 
 int main(void)
@@ -19,6 +19,7 @@ int main(void)
 	motionControlSystem->init();
 	ActuatorsMgr* actuatorsMgr = &ActuatorsMgr::Instance();
 	SensorMgr* sensorMgr = &SensorMgr::Instance();
+	BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
 	//voltage_controller* voltage = &voltage_controller::Instance();
 
 	char order[64];//Permet le stockage du message reçu par la liaison série
@@ -426,7 +427,10 @@ int main(void)
  * 		   *|           |*
  *		   *|ACTIONNEURS|*
  *		   *|___________|*
+ *
  */
+
+			/* --- AX12 ---*/
 
 			else if(!strcmp("setallid",order))
 			{
@@ -464,11 +468,6 @@ int main(void)
 				actuatorsMgr->rightFingerUp();
 
 			}
-
-
-
-
-
 
 			else if(!strcmp("fpl",order)) // Descente du bras gauche aimanté (poissons)
 			{
@@ -561,7 +560,59 @@ int main(void)
 				serial.printfln("Done");
 			}
 
-			else if(!strcmp("uoe",order))
+
+			/* --- Portes sable ---*/
+
+			else if(!strcmp("odl", order)) {
+				binaryMotorMgr->runForwardLeft();
+			}
+
+			else if(!strcmp("odr", order)) {
+				binaryMotorMgr->runForwardRight();
+			}
+
+			else if(!strcmp("cdl", order)) {
+				binaryMotorMgr->runBackwardLeft();
+			}
+
+			else if(!strcmp("cdr", order)) {
+				binaryMotorMgr->runBackwardRight();
+			}
+
+			else if(!strcmp("sdr", order)) {
+				binaryMotorMgr->stopRightDoor();
+			}
+
+			else if(!strcmp("sdl", order)) {
+				binaryMotorMgr->stopLeftDoor();
+			}
+
+
+			/* Axes rotatifs */
+
+			else if(!strcmp("ral", order)) {
+				binaryMotorMgr->runAxisLeft();
+			}
+
+			else if(!strcmp("rar", order)) {
+				binaryMotorMgr->runAxisRight();
+			}
+
+			else if(!strcmp("sal", order)) {
+				binaryMotorMgr->stopAxisLeft();
+			}
+
+			else if(!strcmp("sar", order)) {
+				binaryMotorMgr->stopAxisRight();
+			}
+
+
+
+
+			/* ---Erreurs de communication : --- */
+
+
+			else if(!strcmp("uoe",order)) // test d'un mauvais retour bas niveau --> haut niveau
 			{ // test
 				serial.printfln("Une fraise");
 			}
