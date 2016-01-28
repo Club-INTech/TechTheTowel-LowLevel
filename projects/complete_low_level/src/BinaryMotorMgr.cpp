@@ -21,10 +21,10 @@ BinaryMotorMgr::BinaryMotorMgr() {
 		 *
 		 */
 
-	GPIO_InitTypeDef GPIO_InitStruct;
+		GPIO_InitTypeDef GPIO_InitStruct;
 		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 		// Active l'horloge du port D
-		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 
 
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;

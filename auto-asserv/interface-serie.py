@@ -34,7 +34,7 @@ class serialCom:
     def quitter(self):
         self.port_serie.close()
 
-com=serialCom("COM5")
+com=serialCom("COM7")
 print("--------------------------\n\n")
 m=""
 a=""
