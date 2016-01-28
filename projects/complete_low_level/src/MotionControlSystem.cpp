@@ -34,8 +34,8 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	// maxjerk = 1; // Valeur de jerk maxi(secousse d'accélération)
 
 	delayToStop = 100;
-	toleranceTranslation = 10;
-	toleranceRotation = 10;
+	toleranceTranslation = 50;
+	toleranceRotation = 50;
 
 	translationPID.setTunings(12, 0, 1000);
 	rotationPID.setTunings(15, 0, 1000);
