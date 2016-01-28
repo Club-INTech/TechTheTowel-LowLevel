@@ -72,21 +72,21 @@ public:
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 		GPIO_Init(GPIOA, &GPIO_InitStruct);
-/*
+
 		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 
-		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_13;
+		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 		GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 
-		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
+		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-		GPIO_Init(GPIOA, &GPIO_InitStruct);
-*/
+		GPIO_Init(GPIOC, &GPIO_InitStruct);
+
 		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 
 		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
