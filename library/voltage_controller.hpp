@@ -20,6 +20,11 @@ class voltage_controller : public Singleton<voltage_controller>
 public:
 	voltage_controller()
 	{
+		counter = 0;
+		blink = false;
+		minimal_voltage = 3100;
+		voltage_echelon = 50;
+
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
@@ -67,7 +72,7 @@ public:
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 		GPIO_Init(GPIOA, &GPIO_InitStruct);
-
+/*
 		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 
 		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_13;
@@ -81,7 +86,7 @@ public:
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 		GPIO_Init(GPIOA, &GPIO_InitStruct);
-
+*/
 		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 
 		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
@@ -102,9 +107,8 @@ public:
 
 	void measure()
 	{
-		uint32_t ADCValue;
+		uint32_t ADCValue = 0;
 		ADCValue = adc_convert();
-		//serial.printfln("%d",(int)ADCValue);
 
 		clear_leds();
 
@@ -148,7 +152,7 @@ public:
 		{
 			GPIO_SetBits(GPIOC, GPIO_Pin_7);
 		}
-		if(ADCValue < minimal_voltage )
+		if(ADCValue < minimal_voltage)
 		{
 			counter++;
 			if(counter >= 10) // On utilise un compteur pour éviter un blocage en cas de mauvaise lecture exceptionnelle
@@ -173,10 +177,10 @@ public:
 
 private:
 
-	uint32_t voltage_echelon = 50; //Cherches pas, y'a pas d'unité SI.
-	uint32_t minimal_voltage = 3100; //Là non plus.
-	int counter = 0; //Là t'es con si t'en cherches une...
-	bool blink = false;
+	uint32_t voltage_echelon; //Cherches pas, y'a pas d'unité SI.
+	uint32_t minimal_voltage; //Là non plus.
+	int counter; //Là t'es con si t'en cherches une...
+	bool blink;
 
 
 	void adc_configure(){
@@ -226,4 +230,5 @@ private:
 	 while(!ADC_GetFlagStatus(ADC3, ADC_FLAG_EOC));//Processing the conversion
 	 return ADC_GetConversionValue(ADC3); //Return the converted data
 	}
+
 };
