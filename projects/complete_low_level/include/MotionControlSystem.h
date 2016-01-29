@@ -244,6 +244,7 @@ public:
 	void testSpeedReverse();
 	void longTestSpeed();
 	void testPosition();
+	void testRotation();
 
 };
 

@@ -3,7 +3,7 @@
 #include "delay.h"
 #include "ActuatorsMgr.hpp"
 #include "SensorMgr.h"
-#include "voltage_controller.hpp"
+//#include "voltage_controller.hpp"
 #include "BinaryMotorMgr.hpp"
 
 
@@ -241,6 +241,10 @@ int main(void)
 				motionControlSystem->testPosition();
 			}
 
+			else if(!strcmp("testRotation",order))
+			{
+				motionControlSystem->testRotation();
+			}
 
 
 

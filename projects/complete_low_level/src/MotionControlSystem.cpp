@@ -537,6 +537,22 @@ void MotionControlSystem::testPosition()
 
 }
 
+void MotionControlSystem::testRotation()
+{
+	translationControlled = true;
+	rotationControlled = true;
+	leftSpeedControlled = true;
+	rightSpeedControlled = true;
+
+	resetTracking();
+	orderRotation(3.14, TRIGO);
+	while (moving)
+	{;}
+	printPosition();
+	serial.printf("endtest");
+
+}
+
 void MotionControlSystem::longTestSpeed()
 {
 	translationControlled = false;
