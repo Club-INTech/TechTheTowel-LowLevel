@@ -29,18 +29,18 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	maxSpeed = 4000; // Vitesse maximum, des moteurs (avec une marge au cas où on s'amuse à faire forcer un peu la bestiole).
 	maxSpeedTranslation = 2000; // Consigne max envoyée au PID
 	maxSpeedRotation = 1400;
-	maxAcceleration = 10;
+	maxAcceleration = 50;
 
 	// maxjerk = 1; // Valeur de jerk maxi(secousse d'accélération)
 
 	delayToStop = 100;
-	toleranceTranslation = 50;
-	toleranceRotation = 50;
+	toleranceTranslation = 30;
+	toleranceRotation = 30;
 
-	translationPID.setTunings(12, 0, 1000);
-	rotationPID.setTunings(15, 0, 1000);
-	leftSpeedPID.setTunings(0.01, 0.000025, 0);
-	rightSpeedPID.setTunings(0.01, 0.000025, 0);
+	translationPID.setTunings(12, 0, 0);
+	rotationPID.setTunings(13, 0, 0);
+	leftSpeedPID.setTunings(0.0100, 0.000014, 0);
+	rightSpeedPID.setTunings(0.0095, 0.000014, 0);
 
 	distanceTest = 200;
 
@@ -529,9 +529,10 @@ void MotionControlSystem::testPosition()
 	rightSpeedControlled = true;
 
 	resetTracking();
-	orderTranslation(200);
+	orderTranslation(distanceTest);
 	while(moving)
 	{;}
+	Delay(2000);
 	printPosition();
 	serial.printf("endtest");
 
@@ -548,6 +549,7 @@ void MotionControlSystem::testRotation()
 	orderRotation(3.14, TRIGO);
 	while (moving)
 	{;}
+	Delay(2000);
 	printPosition();
 	serial.printf("endtest");
 
