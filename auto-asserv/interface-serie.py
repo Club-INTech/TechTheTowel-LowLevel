@@ -100,6 +100,29 @@ while(m!='exit'):
         plt.show()
         plt.cla()
         
+    elif (m=="testRotation"):
+        trans=[]
+        Vt=[]
+        St=[]
+        
+        time.sleep(5)
+        while(serialCom.attendre(com)>0):
+            a=serialCom.ecouter(com)
+            data = a.rsplit("\t")
+            if len(data) == 7:
+                trans.append(np.abs(float(data[3])))
+                Vt.append(np.abs(float(data[4])))
+                St.append(np.abs(float(data[5])))
+                
+        T= np.linspace(0, 1.5, len(trans))
+        plt.plot(T, trans, 'r')
+        plt.plot(T, Vt, 'k')
+        plt.plot(T, St, 'b')
+        
+        plt.autoscale()
+        plt.show()
+        plt.cla()
+        
     else:
         time.sleep(0.1)
         while(serialCom.attendre(com)>0):
