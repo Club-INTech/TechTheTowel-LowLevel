@@ -26,7 +26,6 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 
 	curveRadius=0;
 	CIRDirection=0;
-	CIRDistance=0;
 
 	leftSpeedPID.setOutputLimits(-255,255);
 	rightSpeedPID.setOutputLimits(-255,255);
@@ -159,7 +158,7 @@ void MotionControlSystem::control()
 	currentLeftSpeed = averageLeftSpeed.value(); // On utilise pour l'asserv la valeur moyenne des dernieres current Speed
 	currentRightSpeed = averageRightSpeed.value();
 
-	if(!curveTrajectory)
+	if(!curveTrajectory || ABS(averageLeftSpeed.value() - averageRightSpeed.value()) < TOLERANCY)
 	{
 		currentDistance = (leftTicks + rightTicks) / 2;
 		currentAngle = (rightTicks - leftTicks) / 2;
@@ -173,7 +172,7 @@ void MotionControlSystem::control()
 			CIRDirection = currentAngle - TICK_TO_RADIAN*PI*0.5;
 		}
 
-		curveRadius = (WHEEL_DISTANCE_TO_CENTER*MAX(averageLeftSpeed, averageRightSpeed)) / (MAX(averageLeftSpeed, averageRightSpeed) - MIN(averageLeftSpeed, averageRightSpeed)) - WHEEL_DISTANCE_TO_CENTER;
+		curveRadius = (WHEEL_DISTANCE_TO_CENTER*MAX(averageLeftSpeed.value(), averageRightSpeed.value())) / (MAX(averageLeftSpeed.value(), averageRightSpeed.value()) - MIN(averageLeftSpeed.value(), averageRightSpeed.value())) - WHEEL_DISTANCE_TO_CENTER;
 
 		curveAngle = (rightTicks + leftTicks) / (2*curveRadius);
 
@@ -182,7 +181,7 @@ void MotionControlSystem::control()
 
 		// On fake le calculateur de position
 		currentDistance = 2*curveRadius*sin(currentAngle/2);
-		currentAngle = atan2(diffX / diffY);
+		currentAngle = atan(diffX / diffY);
 
 		realOrientation = MAX(leftTicks, rightTicks) - MIN(leftTicks, rightTicks);
 

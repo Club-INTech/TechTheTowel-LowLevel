@@ -85,7 +85,14 @@ int main(void)
 
 			else if(!strcmp("mct", order)) //Rotation + translation = trajectoire courbe !
 			{
-
+				float angle = motionControlSystem->getAngleRadian();
+				int deplacement = 0;
+				serial.read(deplacement);
+				serial.printfln("_");//Acquittement
+				serial.read(angle);
+				serial.printfln("_");//Acquittement
+				motionControlSystem->orderRotation(angle, MotionControlSystem::FREE);
+				motionControlSystem->orderTranslation(deplacement);
 			}
 
 
