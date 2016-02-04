@@ -11,6 +11,7 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	rotationControlled = true;
 	leftSpeedControlled = true;
 	rightSpeedControlled = true;
+	curveTrajectory = false;
 
 	originalAngle = 0.0;
 	rotationSetpoint = 0;
@@ -22,6 +23,10 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	moving = false;
 	moveAbnormal = false;
 	direction = NONE;
+
+	curveRadius=0;
+	CIRDirection=0;
+	CIRDistance=0;
 
 	leftSpeedPID.setOutputLimits(-255,255);
 	rightSpeedPID.setOutputLimits(-255,255);
@@ -154,8 +159,35 @@ void MotionControlSystem::control()
 	currentLeftSpeed = averageLeftSpeed.value(); // On utilise pour l'asserv la valeur moyenne des dernieres current Speed
 	currentRightSpeed = averageRightSpeed.value();
 
-	currentDistance = (leftTicks + rightTicks) / 2;
-	currentAngle = (rightTicks - leftTicks) / 2;
+	if(!curveTrajectory)
+	{
+		currentDistance = (leftTicks + rightTicks) / 2;
+		currentAngle = (rightTicks - leftTicks) / 2;
+	}
+	else
+	{
+		if(averageLeftSpeed.value() < averageRightSpeed.value())
+		{
+			CIRDirection = currentAngle + TICK_TO_RADIAN*PI*0.5;
+		} else {
+			CIRDirection = currentAngle - TICK_TO_RADIAN*PI*0.5;
+		}
+
+		curveRadius = (WHEEL_DISTANCE_TO_CENTER*MAX(averageLeftSpeed, averageRightSpeed)) / (MAX(averageLeftSpeed, averageRightSpeed) - MIN(averageLeftSpeed, averageRightSpeed)) - WHEEL_DISTANCE_TO_CENTER;
+
+		curveAngle = (rightTicks + leftTicks) / (2*curveRadius);
+
+		diffX = curveRadius*(cos(curveAngle * TICK_TO_RADIAN + originalAngle)*(1 + cos(CIRDirection * TICK_TO_RADIAN + originalAngle)) + sin(curveAngle * TICK_TO_RADIAN + originalAngle)*sin(CIRDirection * TICK_TO_RADIAN + originalAngle));
+		diffY = curveRadius*(sin(CIRDirection * TICK_TO_RADIAN + originalAngle)*(1 + cos(curveAngle * TICK_TO_RADIAN + originalAngle)) + sin(curveAngle * TICK_TO_RADIAN + originalAngle)*cos(CIRDirection * TICK_TO_RADIAN + originalAngle));
+
+		// On fake le calculateur de position
+		currentDistance = 2*curveRadius*sin(currentAngle/2);
+		currentAngle = atan2(diffX / diffY);
+
+		realOrientation = MAX(leftTicks, rightTicks) - MIN(leftTicks, rightTicks);
+
+	}
+
 
 	if(translationControlled)
 		translationPID.compute();	// Actualise la valeur de 'translationSpeed'
@@ -191,7 +223,7 @@ void MotionControlSystem::control()
 		rightSpeedSetpoint = maxSpeed;
 	else if(rightSpeedSetpoint < -maxSpeed)
 		rightSpeedSetpoint = -maxSpeed;
-
+;
 
 	// Limitation de l'accélération du moteur gauche
 	if(leftSpeedSetpoint - previousLeftSpeedSetpoint > maxAcceleration)
@@ -301,6 +333,11 @@ void MotionControlSystem::updatePosition() {
 
 	x += (deltaDistanceMm * cos(getAngleRadian()));
 	y += (deltaDistanceMm * sin(getAngleRadian()));
+
+	if(curveTrajectory)
+	{
+		currentAngle = realOrientation;
+	}
 }
 
 

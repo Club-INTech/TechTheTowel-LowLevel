@@ -75,14 +75,17 @@ int main(void)
 				motionControlSystem->orderRotation(angle, MotionControlSystem::ANTITRIGO);
 			}
 
-
-
 			else if(!strcmp("tol", order))  // Ordre de rotation seulement à GAUCHE (pour ne pas perdre le sable)
 			{
 				float angle = motionControlSystem->getAngleRadian();
 				serial.read(angle);
 				serial.printfln("_");//Acquittement
 				motionControlSystem->orderRotation(angle, MotionControlSystem::TRIGO);
+			}
+
+			else if(!strcmp("mct", order)) //Rotation + translation = trajectoire courbe !
+			{
+
 			}
 
 
@@ -654,8 +657,8 @@ void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 		TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
 
 		//Asservissement et mise à jour de la position
-		motionControlSystem->updatePosition();
 		motionControlSystem->control();
+		motionControlSystem->updatePosition();
 
 		if (i >= 10) { //5ms
 			//Gestion de l'arrêt
