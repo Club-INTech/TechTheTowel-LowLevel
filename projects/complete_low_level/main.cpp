@@ -688,10 +688,25 @@ void EXTI9_5_IRQHandler(void)
     if (EXTI_GetITStatus(EXTI_Line6) != RESET) {
         sensorMgr->sensorInterrupt();
 
-        /* Clear interrupt flag
-         *  Pingu in the Main ! */
+        /* Clear interrupt flag */
         EXTI_ClearITPendingBit(EXTI_Line6);
     }
 }
-
+/*
+ *   Pingu in the Main !
+ *      	  . --- .
+		    /        \
+		   |  O  _  O |
+		   |  ./   \. |
+		   /  `-._.-'  \
+		.' /         \ `.
+	.-~.-~/           \~-.~-.
+.-~ ~    |             |    ~ ~-.
+`- .     |             |     . -'
+	 ~ - |             | - ~
+	 	 \             /
+	 	___\           /___
+	 	~;_  >- . . -<  _i~
+	 	  `'         `'
+*/
 }

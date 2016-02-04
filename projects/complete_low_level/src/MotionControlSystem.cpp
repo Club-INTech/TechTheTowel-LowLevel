@@ -29,7 +29,7 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	maxSpeed = 4000; // Vitesse maximum, des moteurs (avec une marge au cas où on s'amuse à faire forcer un peu la bestiole).
 	maxSpeedTranslation = 2000; // Consigne max envoyée au PID
 	maxSpeedRotation = 1400;
-	maxAcceleration = 50;
+	maxAcceleration = 20;
 
 	// maxjerk = 1; // Valeur de jerk maxi(secousse d'accélération)
 

@@ -32,8 +32,17 @@ SensorMgr::SensorMgr():
 
 	GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 
-	//Jumper (PC9)
+
+
+/*         _________________________________________
+		 *|								            |*
+		 *|  Capteurs de contact (portes + jumper)  |*
+		 *|_________________________________________|*
+*/
+
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);//Active l'horloge du port C
+
+	//Jumper (PC9)
 
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
@@ -41,8 +50,34 @@ SensorMgr::SensorMgr():
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+	// Capteur porte DROITE OUVERTE (PC0)
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 
+	// Capteur porte GAUCHE OUVERTE (PC15)
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_15;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+	// Capteur porte DROITE FERMEE (PC13)
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_13;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+	// Capteur porte GAUCHE FERMEE (PC1)
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 /*     ________________________________
 	 *|								   |*
@@ -55,8 +90,9 @@ SensorMgr::SensorMgr():
 	 * Capteur de Test : PA6
 	 */
 
-	/* Activation de l'horloge du port GPIOA */
+	/* Activation de l'horloge du port A */
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+
 
 	/* Activation de l'horloge du SYSCFG */
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
@@ -65,7 +101,7 @@ SensorMgr::SensorMgr():
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;I
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -137,6 +173,8 @@ int SensorMgr::getSensorDistance() {
  * Fonctions de récupération de l'état des capteurs de contact et du jumper
  */
 
+
 bool SensorMgr::isJumperOut() const{
 	return !GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9);
 }
+
