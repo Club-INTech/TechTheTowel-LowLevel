@@ -429,6 +429,7 @@ void MotionControlSystem::orderCurveTrajectory(int32_t arcLength, int32_t curveR
 	rightCurveRatio = (((ABS(curveRadius)-radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
 
 	enableRotationControl(false);
+	curveMovement = true;
 	orderTranslation(arcLength);
 	orderRotation(finalAngle, FREE);
 }
