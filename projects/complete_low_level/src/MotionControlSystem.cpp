@@ -11,7 +11,6 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	rotationControlled = true;
 	leftSpeedControlled = true;
 	rightSpeedControlled = true;
-	curveTrajectory = false;
 
 	originalAngle = 0.0;
 	rotationSetpoint = 0;
@@ -27,9 +26,6 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 
 	leftCurveRatio = 1.0;
 	rightCurveRatio = 1.0;
-
-	curveRadius=0;
-	CIRDirection=0;
 
 	leftSpeedPID.setOutputLimits(-255,255);
 	rightSpeedPID.setOutputLimits(-255,255);
@@ -162,35 +158,8 @@ void MotionControlSystem::control()
 	currentLeftSpeed = averageLeftSpeed.value(); // On utilise pour l'asserv la valeur moyenne des dernieres current Speed
 	currentRightSpeed = averageRightSpeed.value();
 
-	if(ABS(averageLeftSpeed.value() - averageRightSpeed.value()) < TOLERANCY)
-	{
-		currentDistance = (leftTicks + rightTicks) / 2;
-		currentAngle = (rightTicks - leftTicks) / 2;
-	}
-	else
-	{
-		curveTrajectory = true;
-		if(averageLeftSpeed.value() < averageRightSpeed.value())
-		{
-			CIRDirection = currentAngle + TICK_TO_RADIAN*PI*0.5;
-		} else {
-			CIRDirection = currentAngle - TICK_TO_RADIAN*PI*0.5;
-		}
-
-		curveRadius = (WHEEL_DISTANCE_TO_CENTER*MAX(averageLeftSpeed.value(), averageRightSpeed.value())) / (MAX(averageLeftSpeed.value(), averageRightSpeed.value()) - MIN(averageLeftSpeed.value(), averageRightSpeed.value())) - WHEEL_DISTANCE_TO_CENTER;
-
-		curveAngle = (rightTicks + leftTicks) / (2*curveRadius);
-
-		diffX = curveRadius*(cos(curveAngle * TICK_TO_RADIAN + originalAngle)*(1 + cos(CIRDirection * TICK_TO_RADIAN + originalAngle)) + sin(curveAngle * TICK_TO_RADIAN + originalAngle)*sin(CIRDirection * TICK_TO_RADIAN + originalAngle));
-		diffY = curveRadius*(sin(CIRDirection * TICK_TO_RADIAN + originalAngle)*(1 + cos(curveAngle * TICK_TO_RADIAN + originalAngle)) + sin(curveAngle * TICK_TO_RADIAN + originalAngle)*cos(CIRDirection * TICK_TO_RADIAN + originalAngle));
-
-		// On fake le calculateur de position
-		currentDistance = 2*curveRadius*sin(currentAngle/2);
-		currentAngle = atan(diffX / diffY);
-
-		realOrientation = MAX(leftTicks, rightTicks) - MIN(leftTicks, rightTicks);
-
-	}
+	currentDistance = (leftTicks + rightTicks) / 2;
+	currentAngle = (rightTicks - leftTicks) / 2;
 
 
 	if(translationControlled)
@@ -337,12 +306,6 @@ void MotionControlSystem::updatePosition() {
 
 	x += (deltaDistanceMm * cos(getAngleRadian()));
 	y += (deltaDistanceMm * sin(getAngleRadian()));
-
-	if(curveTrajectory)
-	{
-		currentAngle = realOrientation;
-		curveTrajectory = false;
-	}
 }
 
 
@@ -420,13 +383,13 @@ void MotionControlSystem::orderRotation(float angleConsigneRadian, RotationWay r
 void MotionControlSystem::orderCurveTrajectory(int32_t arcLength, int32_t curveRadius)
 {
 	int32_t radiusDiff = WHEEL_DISTANCE_TO_CENTER;
-	float finalAngle = (arcLength / curveRadius) + getAngleRadian();
+	float finalAngle = (arcLength / ABS(curveRadius)) + getAngleRadian();
 
-	if(curveRadius < 0 )
-		radiusDiff = -radiusDiff;
+	if(curveRadius < 0 ) // Si le rayon de courbure est négatif, on tourne dans l'autre sens
+		radiusDiff = (-1)*radiusDiff;
 
-	leftCurveRatio = (((ABS(curveRadius)+radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
-	rightCurveRatio = (((ABS(curveRadius)-radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
+	leftCurveRatio = (((ABS(curveRadius)-radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
+	rightCurveRatio = (((ABS(curveRadius)+radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
 
 	enableRotationControl(false);
 	curveMovement = true;

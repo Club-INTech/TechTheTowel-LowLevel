@@ -107,15 +107,6 @@ private:
 	volatile float leftCurveRatio;
 	volatile float rightCurveRatio;
 
-	// Valeurs necessaires pour calcul de trajectoires courbes
-	volatile int32_t curveRadius;
-	volatile int32_t diffX;
-	volatile int32_t diffY;
-	volatile int32_t CIRDirection;
-	volatile int32_t curveAngle;
-	volatile int32_t difference;
-	volatile int32_t realOrientation;
-
 
 	/*
 	// Limitation de Jerk
@@ -157,7 +148,6 @@ private:
 	volatile bool leftSpeedControlled;
 	volatile bool rightSpeedControlled;
 
-	volatile bool curveTrajectory;
 	volatile bool curveMovement;
 
 	// Variables de réglage de la détection de blocage physique
