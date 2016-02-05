@@ -83,16 +83,15 @@ int main(void)
 				motionControlSystem->orderRotation(angle, MotionControlSystem::TRIGO);
 			}
 
-			else if(!strcmp("mct", order)) //Rotation + translation = trajectoire courbe !
+			else if(!strcmp("dc", order)) //Rotation + translation = trajectoire courbe !
 			{
-				float angle = motionControlSystem->getAngleRadian();
-				int deplacement = 0;
-				serial.read(deplacement);
+				int32_t arcLenght = 0;
+				int32_t curveRadius = 0;
+				serial.read(arcLenght);
 				serial.printfln("_");//Acquittement
-				serial.read(angle);
+				serial.read(curveRadius);
 				serial.printfln("_");//Acquittement
-				motionControlSystem->orderRotation(angle, MotionControlSystem::FREE);
-				motionControlSystem->orderTranslation(deplacement);
+				motionControlSystem->orderCurveTrajectory(arcLenght, curveRadius);
 			}
 
 
