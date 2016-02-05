@@ -21,7 +21,11 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	y = 0;
 	moving = false;
 	moveAbnormal = false;
+	curveMovement = false;
 	direction = NONE;
+
+	leftCurveRatio = 1.0;
+	rightCurveRatio = 1.0;
 
 	leftSpeedPID.setOutputLimits(-255,255);
 	rightSpeedPID.setOutputLimits(-255,255);
@@ -157,6 +161,7 @@ void MotionControlSystem::control()
 	currentDistance = (leftTicks + rightTicks) / 2;
 	currentAngle = (rightTicks - leftTicks) / 2;
 
+
 	if(translationControlled)
 		translationPID.compute();	// Actualise la valeur de 'translationSpeed'
 	if(rotationControlled)
@@ -176,9 +181,9 @@ void MotionControlSystem::control()
 	else if(rotationSpeed < -maxSpeedRotation)
 		rotationSpeed = -maxSpeedRotation;
 
+	leftSpeedSetpoint = translationSpeed*leftCurveRatio - rotationSpeed;
+	rightSpeedSetpoint = translationSpeed*rightCurveRatio + rotationSpeed;
 
-	leftSpeedSetpoint = translationSpeed - rotationSpeed;
-	rightSpeedSetpoint = translationSpeed + rotationSpeed;
 
 
 
@@ -191,7 +196,7 @@ void MotionControlSystem::control()
 		rightSpeedSetpoint = maxSpeed;
 	else if(rightSpeedSetpoint < -maxSpeed)
 		rightSpeedSetpoint = -maxSpeed;
-
+;
 
 	// Limitation de l'accélération du moteur gauche
 	if(leftSpeedSetpoint - previousLeftSpeedSetpoint > maxAcceleration)
@@ -375,6 +380,23 @@ void MotionControlSystem::orderRotation(float angleConsigneRadian, RotationWay r
 	moveAbnormal = false;
 }
 
+void MotionControlSystem::orderCurveTrajectory(int32_t arcLength, int32_t curveRadius)
+{
+	int32_t radiusDiff = WHEEL_DISTANCE_TO_CENTER;
+	float finalAngle = (arcLength / ABS(curveRadius)) + getAngleRadian();
+
+	if(curveRadius < 0 ) // Si le rayon de courbure est négatif, on tourne dans l'autre sens
+		radiusDiff = (-1)*radiusDiff;
+
+	leftCurveRatio = (((ABS(curveRadius)-radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
+	rightCurveRatio = (((ABS(curveRadius)+radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
+
+	enableRotationControl(false);
+	curveMovement = true;
+	orderTranslation(arcLength);
+	orderRotation(finalAngle, FREE);
+}
+
 
 void MotionControlSystem::orderRawPwm(Side side, int16_t pwm) {
 	if (side == Side::LEFT)
@@ -389,9 +411,15 @@ void MotionControlSystem::stop() {
 	leftSpeedSetpoint = 0;
 	rightSpeedSetpoint = 0;
 
+	if(curveMovement) //Si l'on était en trajectoire courbe, on remet l'asserv en rotation
+		enableRotationControl(true);
+
 	leftMotor.run(0);
 	rightMotor.run(0);
 	moving = false;
+	curveMovement = false;
+	leftCurveRatio = 1.0;
+	rightCurveRatio = 1.0;
 	translationPID.resetErrors();
 	rotationPID.resetErrors();
 	leftSpeedPID.resetErrors();

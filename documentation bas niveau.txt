@@ -111,6 +111,8 @@ tor		Turn Only Right		Rotation absolue. Permet de ne tourner qu'à droite, pour n
 
 tol		Turn Only Left		Rotation absolue. Permet de ne tourner qu'à gauche, pour ne pas perdre le sable.
 
+dc		Déplacement courbe	Permer d'ordonner un déplacement courbe. A donner dans l'ordre : Longueur d'arc et rayon de courbure
+					Tourne en sens trigo si le rayon de courbure est positif. Anti-trigo si négatif.
 
 t3		Ordonne une rotation relative.
 		La ligne suivante doit être un FLOTANT correspondant à l'angle de rotation voulu, en radians.

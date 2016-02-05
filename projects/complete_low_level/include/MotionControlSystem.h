@@ -25,6 +25,9 @@
 
 #define AVERAGE_SPEED_SIZE	25
 
+#define WHEEL_DISTANCE_TO_CENTER 87
+#define TOLERANCY 50
+
 #if DEBUG
 #define TRACKER_SIZE 		1500
 #else
@@ -100,6 +103,11 @@ private:
 	//	Limitation d'accélération
 	volatile int32_t maxAcceleration;
 
+	//Les ratios de vitesse pour commander un déplacement courbe
+	volatile float leftCurveRatio;
+	volatile float rightCurveRatio;
+
+
 	/*
 	// Limitation de Jerk
 	volatile int32_t maxjerk;
@@ -139,6 +147,8 @@ private:
 	volatile bool rotationControlled;
 	volatile bool leftSpeedControlled;
 	volatile bool rightSpeedControlled;
+
+	volatile bool curveMovement;
 
 	// Variables de réglage de la détection de blocage physique
 	unsigned int delayToStop;//En ms
@@ -212,6 +222,7 @@ public:
 	void orderTranslation(int32_t);
 	void orderRotation(float, RotationWay);
 	void orderRawPwm(Side,int16_t);
+	void orderCurveTrajectory(int32_t,int32_t);
 	void stop();
 	static int32_t optimumAngle(int32_t,int32_t);
 
