@@ -222,7 +222,7 @@ public:
 	void orderTranslation(int32_t);
 	void orderRotation(float, RotationWay);
 	void orderRawPwm(Side,int16_t);
-	void orderCurveTrajectory(int32_t,int32_t);
+	void orderCurveTrajectory(float,float);
 	void stop();
 	static int32_t optimumAngle(int32_t,int32_t);
 

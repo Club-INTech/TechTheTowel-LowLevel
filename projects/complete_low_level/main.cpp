@@ -85,8 +85,8 @@ int main(void)
 
 			else if(!strcmp("dc", order)) //Rotation + translation = trajectoire courbe !
 			{
-				int32_t arcLenght = 0;
-				int32_t curveRadius = 0;
+				float arcLenght = 0;
+				float curveRadius = 0;
 				serial.read(arcLenght);
 				serial.printfln("_");//Acquittement
 				serial.read(curveRadius);

@@ -380,9 +380,9 @@ void MotionControlSystem::orderRotation(float angleConsigneRadian, RotationWay r
 	moveAbnormal = false;
 }
 
-void MotionControlSystem::orderCurveTrajectory(int32_t arcLength, int32_t curveRadius)
+void MotionControlSystem::orderCurveTrajectory(float arcLength, float curveRadius)
 {
-	int32_t radiusDiff = WHEEL_DISTANCE_TO_CENTER;
+	float radiusDiff = WHEEL_DISTANCE_TO_CENTER;
 	float finalAngle = (arcLength / ABS(curveRadius)) + getAngleRadian();
 
 	if(curveRadius < 0 ) // Si le rayon de courbure est négatif, on tourne dans l'autre sens
@@ -393,8 +393,9 @@ void MotionControlSystem::orderCurveTrajectory(int32_t arcLength, int32_t curveR
 
 	enableRotationControl(false);
 	curveMovement = true;
-	orderTranslation(arcLength);
+	orderTranslation(static_cast<int32_t>(arcLength));
 	orderRotation(finalAngle, FREE);
+	rotationPID.resetErrors();
 }
 
 
