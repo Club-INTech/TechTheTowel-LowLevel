@@ -201,21 +201,21 @@ void MotionControlSystem::control()
 	// Limitation de l'accélération du moteur gauche
 	if(leftSpeedSetpoint - previousLeftSpeedSetpoint > maxAcceleration)
 	{
-		leftSpeedSetpoint = previousLeftSpeedSetpoint + maxAcceleration;
+		leftSpeedSetpoint = previousLeftSpeedSetpoint + maxAcceleration*leftCurveRatio;
 	}
 	else if(leftSpeedSetpoint - previousLeftSpeedSetpoint < -maxAcceleration)
 	{
-		leftSpeedSetpoint = previousLeftSpeedSetpoint - maxAcceleration;
+		leftSpeedSetpoint = previousLeftSpeedSetpoint - maxAcceleration*leftCurveRatio;
 	}
 
 	// Limitation de l'accélération du moteur droit
 	if(rightSpeedSetpoint - previousRightSpeedSetpoint > maxAcceleration)
 	{
-		rightSpeedSetpoint = previousRightSpeedSetpoint + maxAcceleration;
+		rightSpeedSetpoint = previousRightSpeedSetpoint + maxAcceleration*rightCurveRatio;
 	}
 	else if(rightSpeedSetpoint - previousRightSpeedSetpoint < -maxAcceleration)
 	{
-		rightSpeedSetpoint = previousRightSpeedSetpoint - maxAcceleration;
+		rightSpeedSetpoint = previousRightSpeedSetpoint - maxAcceleration*rightCurveRatio;
 	}
 
 	/*
@@ -388,14 +388,17 @@ void MotionControlSystem::orderCurveTrajectory(float arcLength, float curveRadiu
 	if(curveRadius < 0 ) // Si le rayon de courbure est négatif, on tourne dans l'autre sens
 		radiusDiff = (-1)*radiusDiff;
 
-	leftCurveRatio = (((ABS(curveRadius)-radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
-	rightCurveRatio = (((ABS(curveRadius)+radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
+	//leftCurveRatio = (((ABS(curveRadius)-radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
+	//rightCurveRatio = (((ABS(curveRadius)+radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
+	leftCurveRatio = (ABS(curveRadius)-radiusDiff)/ABS(curveRadius);
+	rightCurveRatio = (ABS(curveRadius)+radiusDiff)/ABS(curveRadius);
 
 	enableRotationControl(false);
 	curveMovement = true;
+	serial.printfln("%d",static_cast<int32_t>(arcLength));
 	orderTranslation(static_cast<int32_t>(arcLength));
 	orderRotation(finalAngle, FREE);
-	rotationPID.resetErrors();
+	//rotationPID.resetErrors();
 }
 
 
