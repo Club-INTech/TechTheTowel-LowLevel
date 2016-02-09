@@ -388,8 +388,6 @@ void MotionControlSystem::orderCurveTrajectory(float arcLength, float curveRadiu
 	if(curveRadius < 0 ) // Si le rayon de courbure est négatif, on tourne dans l'autre sens
 		radiusDiff = (-1)*radiusDiff;
 
-	//leftCurveRatio = (((ABS(curveRadius)-radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
-	//rightCurveRatio = (((ABS(curveRadius)+radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
 	leftCurveRatio = (ABS(curveRadius)-radiusDiff)/ABS(curveRadius);
 	rightCurveRatio = (ABS(curveRadius)+radiusDiff)/ABS(curveRadius);
 
@@ -397,7 +395,7 @@ void MotionControlSystem::orderCurveTrajectory(float arcLength, float curveRadiu
 	curveMovement = true;
 	orderTranslation(static_cast<int32_t>(arcLength));
 	orderRotation(finalAngle, FREE);
-	rotationPID.resetErrors();
+	//rotationPID.resetErrors();
 }
 
 
