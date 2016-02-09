@@ -395,10 +395,9 @@ void MotionControlSystem::orderCurveTrajectory(float arcLength, float curveRadiu
 
 	enableRotationControl(false);
 	curveMovement = true;
-	serial.printfln("%d",static_cast<int32_t>(arcLength));
 	orderTranslation(static_cast<int32_t>(arcLength));
 	orderRotation(finalAngle, FREE);
-	//rotationPID.resetErrors();
+	rotationPID.resetErrors();
 }
 
 
