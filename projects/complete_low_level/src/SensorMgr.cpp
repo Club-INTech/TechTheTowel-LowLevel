@@ -16,7 +16,8 @@
 
 
 SensorMgr::SensorMgr():
-	ultrason()
+	ultrasonAVD(),
+	ultrasonAVG()
 {
 	lastRefreshTime = 0;
 	refreshDelay = 13;//(ms)
@@ -131,7 +132,49 @@ SensorMgr::SensorMgr():
 	/* Add to NVIC */
 	NVIC_Init(&NVIC_InitStruct);
 
-	ultrason.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);//On donne les paramètres de la pin et de l'interruption au capteur pour qu'il puisse les modifier sans faire d'erreur
+	ultrasonAVD.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);//On donne les paramètres de la pin et de l'interruption au capteur pour qu'il puisse les modifier sans faire d'erreur
+
+	/* Activation de l'horloge du port A */
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+
+	/* Activation de l'horloge du SYSCFG */
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+
+	/*Réglages de la pin*/
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	/* Tell system that you will use PA6 for EXTI_Line6 */
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource4);
+
+	/* PA6 is connected to EXTI_Line6 */
+	EXTI_InitStruct.EXTI_Line = EXTI_Line4;
+	/* Enable interrupt */
+	EXTI_InitStruct.EXTI_LineCmd = DISABLE;
+	/* Interrupt mode */
+	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+	/* Triggers on rising and falling edge */
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+	/* Add to EXTI */
+	EXTI_Init(&EXTI_InitStruct);
+
+	/* Add IRQ vector to NVIC */
+	/* PA6 is connected to EXTI_Line6, which has EXTI9_5_IRQn vector */
+	NVIC_InitStruct.NVIC_IRQChannel = EXTI4_IRQn;
+	/* Set priority */
+	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
+	/* Set sub priority */
+	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x01;
+	/* Enable interrupt */
+	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+	/* Add to NVIC */
+	NVIC_Init(&NVIC_InitStruct);
+
+	ultrasonAVG.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);//On donne les paramètres de la pin et de l'interruption au capteur pour qu'il puisse les modifier sans faire d'erreur
 
 }
 
@@ -141,10 +184,19 @@ SensorMgr::SensorMgr():
 void SensorMgr::refresh()
 {
 	currentTime = Millis();
+	static uint8_t capteur = 0;
 
 	if(currentTime - lastRefreshTime >= refreshDelay)
 	{
-		ultrason.refresh();
+		if(capteur == 0)
+		{
+			ultrasonAVG.refresh();
+		}
+		if(capteur == 1)
+		{
+			ultrasonAVD.refresh();
+		}
+		capteur = (capteur+1)%2;
 		lastRefreshTime = currentTime;
 	}
 }
@@ -154,8 +206,11 @@ void SensorMgr::refresh()
  * Fonctions d'interruption des capteurs à ultrason
  */
 
-void SensorMgr::sensorInterrupt(){
-	ultrason.interruption();
+void SensorMgr::sensorInterrupt(int pin){
+	if(pin == 4)
+		ultrasonAVG.interruption();
+	else if(pin == 6)
+		ultrasonAVD.interruption();
 }
 
 
@@ -163,8 +218,30 @@ void SensorMgr::sensorInterrupt(){
  * Fonctions de récupération de la distance mesurée
  */
 
-int SensorMgr::getSensorDistance() {
-	return ultrason.value();
+int SensorMgr::getSensorDistanceAVG() {
+	return ultrasonAVG.value();
+}
+
+/*
+ * Fonctions de récupération de la distance mesurée
+ */
+
+int SensorMgr::getSensorDistanceAVD() {
+	return ultrasonAVD.value();
+}
+/*
+ * Fonctions de récupération de la distance mesurée
+ */
+
+int SensorMgr::getSensorDistanceARG() {
+	return 0;
+}
+/*
+ * Fonctions de récupération de la distance mesurée
+ */
+
+int SensorMgr::getSensorDistanceARD() {
+	return 0;
 }
 
 
