@@ -20,15 +20,19 @@ class SensorMgr : public Singleton<SensorMgr>
 public:
 	SensorMgr();
 
-	int getSensorDistance();
+	int getSensorDistanceAVG();
+	int getSensorDistanceAVD();
+	int getSensorDistanceARG();
+	int getSensorDistanceARD();
 	bool isJumperOut() const;
 
 	void refresh();
 
-	void sensorInterrupt();
+	void sensorInterrupt(int);
 
 private:
-	CapteurSRF ultrason;
+	CapteurSRF ultrasonAVD;
+	CapteurSRF ultrasonAVG;
 
 	unsigned int refreshDelay;
 	unsigned int currentTime;
