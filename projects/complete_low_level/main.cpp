@@ -85,8 +85,8 @@ int main(void)
 
 			else if(!strcmp("dc", order)) //Rotation + translation = trajectoire courbe !
 			{
-				int32_t arcLenght = 0;
-				int32_t curveRadius = 0;
+				float arcLenght = 0;
+				float curveRadius = 0;
 				serial.read(arcLenght);
 				serial.printfln("_");//Acquittement
 				serial.read(curveRadius);
@@ -113,9 +113,12 @@ int main(void)
 			{
 				motionControlSystem->stop();
 			}
-			else if(!strcmp("us",order))		//Indiquer la distance mesurée par le capteur à ultrason
+			else if(!strcmp("us",order))		//Indiquer la distance mesurée par les capteurs à ultrason
 			{
-				serial.printfln("%d", sensorMgr->getSensorDistance());//en mm
+				serial.printfln("%d", sensorMgr->getSensorDistanceAVG());//en mm
+				serial.printfln("%d", sensorMgr->getSensorDistanceAVD());//en mm
+				serial.printfln("%d", sensorMgr->getSensorDistanceARG());//en mm
+				serial.printfln("%d", sensorMgr->getSensorDistanceARD());//en mm
 			}
 			else if(!strcmp("j",order))			//Indiquer l'état du jumper (0='en place'; 1='dehors')
 			{
@@ -709,12 +712,13 @@ void EXTI9_5_IRQHandler(void)
 
 	//Interruptions de l'ultrason de test
     if (EXTI_GetITStatus(EXTI_Line6) != RESET) {
-        sensorMgr->sensorInterrupt();
-
+        sensorMgr->sensorInterrupt(6);
+        //serial.printfln("interrupt 6");
         /* Clear interrupt flag */
         EXTI_ClearITPendingBit(EXTI_Line6);
     }
 }
+
 void EXTI0_IRQHandler(void) // Capteur fin de course droite ouverte
 {
 	/*
@@ -735,20 +739,33 @@ void EXTI1_IRQHandler(void) // Capteur fin de course
 
 
 
+
+void EXTI4_IRQHandler(void)
+{
+	static SensorMgr* sensorMgr = &SensorMgr::Instance();
+
+	if (EXTI_GetITStatus(EXTI_Line4) != RESET) {
+	        sensorMgr->sensorInterrupt(4);
+	       // serial.printfln("interrupt 4");
+	        /* Clear interrupt flag */
+	        EXTI_ClearITPendingBit(EXTI_Line4);
+	    }
+}
+
 /*
- *   Pingu in the Main !
+ *   Dead Pingu in the Main !
  *      	  . --- .
 		    /        \
-		   |  O  _  O |
+		   |  X  _  X |
 		   |  ./   \. |
 		   /  `-._.-'  \
 		.' /         \ `.
-	.-~.-~/           \~-.~-.
-.-~ ~    |             |    ~ ~-.
-`- .     |             |     . -'
-	 ~ - |             | - ~
+	.-~.-~/    o   o  \~-.~-.
+.-~ ~    |    o  o     |    ~ ~-.
+`- .     |      o  o   |     . -'
+	 ~ - |      o      | - ~
 	 	 \             /
-	 	___\           /___
+	 	__\           /___
 	 	~;_  >- . . -<  _i~
 	 	  `'         `'
 */

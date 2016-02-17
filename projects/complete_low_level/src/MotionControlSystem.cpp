@@ -206,21 +206,21 @@ void MotionControlSystem::control()
 	// Limitation de l'accélération du moteur gauche
 	if(leftSpeedSetpoint - previousLeftSpeedSetpoint > maxAcceleration)
 	{
-		leftSpeedSetpoint = previousLeftSpeedSetpoint + maxAcceleration;
+		leftSpeedSetpoint = previousLeftSpeedSetpoint + maxAcceleration*leftCurveRatio;
 	}
 	else if(leftSpeedSetpoint - previousLeftSpeedSetpoint < -maxAcceleration)
 	{
-		leftSpeedSetpoint = previousLeftSpeedSetpoint - maxAcceleration;
+		leftSpeedSetpoint = previousLeftSpeedSetpoint - maxAcceleration*leftCurveRatio;
 	}
 
 	// Limitation de l'accélération du moteur droit
 	if(rightSpeedSetpoint - previousRightSpeedSetpoint > maxAcceleration)
 	{
-		rightSpeedSetpoint = previousRightSpeedSetpoint + maxAcceleration;
+		rightSpeedSetpoint = previousRightSpeedSetpoint + maxAcceleration*rightCurveRatio;
 	}
 	else if(rightSpeedSetpoint - previousRightSpeedSetpoint < -maxAcceleration)
 	{
-		rightSpeedSetpoint = previousRightSpeedSetpoint - maxAcceleration;
+		rightSpeedSetpoint = previousRightSpeedSetpoint - maxAcceleration*rightCurveRatio;
 	}
 
 	/*
@@ -385,21 +385,22 @@ void MotionControlSystem::orderRotation(float angleConsigneRadian, RotationWay r
 	moveAbnormal = false;
 }
 
-void MotionControlSystem::orderCurveTrajectory(int32_t arcLength, int32_t curveRadius)
+void MotionControlSystem::orderCurveTrajectory(float arcLength, float curveRadius)
 {
-	int32_t radiusDiff = WHEEL_DISTANCE_TO_CENTER;
+	float radiusDiff = WHEEL_DISTANCE_TO_CENTER;
 	float finalAngle = (arcLength / ABS(curveRadius)) + getAngleRadian();
 
 	if(curveRadius < 0 ) // Si le rayon de courbure est négatif, on tourne dans l'autre sens
 		radiusDiff = (-1)*radiusDiff;
 
-	leftCurveRatio = (((ABS(curveRadius)-radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
-	rightCurveRatio = (((ABS(curveRadius)+radiusDiff)*(finalAngle - getAngleRadian())) / arcLength);
+	leftCurveRatio = (ABS(curveRadius)-radiusDiff)/ABS(curveRadius);
+	rightCurveRatio = (ABS(curveRadius)+radiusDiff)/ABS(curveRadius);
 
 	enableRotationControl(false);
 	curveMovement = true;
-	orderTranslation(arcLength);
+	orderTranslation(static_cast<int32_t>(arcLength));
 	orderRotation(finalAngle, FREE);
+	//rotationPID.resetErrors();
 }
 
 

@@ -25,7 +25,7 @@
 
 #define AVERAGE_SPEED_SIZE	25
 
-#define WHEEL_DISTANCE_TO_CENTER 87
+#define WHEEL_DISTANCE_TO_CENTER 145.1
 #define TOLERANCY 50
 
 #if DEBUG
@@ -224,7 +224,7 @@ public:
 	void orderTranslation(int32_t);
 	void orderRotation(float, RotationWay);
 	void orderRawPwm(Side,int16_t);
-	void orderCurveTrajectory(int32_t,int32_t);
+	void orderCurveTrajectory(float,float);
 	void stop();
 	static int32_t optimumAngle(int32_t,int32_t);
 
