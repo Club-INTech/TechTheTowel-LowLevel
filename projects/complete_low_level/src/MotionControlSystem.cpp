@@ -102,6 +102,11 @@ void MotionControlSystem::enableRotationControl(bool enabled) {
 	rotationControlled = enabled;
 }
 
+void MotionControlSystem::enableSpeedControl(bool enabled){
+	leftSpeedControlled = enabled;
+	rightSpeedControlled = enabled;
+}
+
 void MotionControlSystem::control()
 {
 	// Pour le calcul de la vitesse instantanée :

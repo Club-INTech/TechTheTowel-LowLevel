@@ -255,6 +255,20 @@ int main(void)
 				motionControlSystem->testRotation();
 			}
 
+			else if(!strcmp("av", order))
+			{
+				static bool asservVitesse = false;
+				motionControlSystem->enableSpeedControl(asservVitesse);
+				serial.printf("L'asserv en vitesse est ");
+				if(!asservVitesse)
+				{
+					serial.printfln("desactivée");
+				}
+				else {
+					serial.printfln("activée");
+				}
+			}
+
 
 
 /**
@@ -701,6 +715,26 @@ void EXTI9_5_IRQHandler(void)
         EXTI_ClearITPendingBit(EXTI_Line6);
     }
 }
+void EXTI0_IRQHandler(void) // Capteur fin de course droite ouverte
+{
+	/*
+	Uart<1> serial;
+	serial.init(115200);
+	serial.println("INTERRUPTION PC0 MOTHERFUCKER !!!");
+	*/
+}
+
+void EXTI1_IRQHandler(void) // Capteur fin de course
+{
+	/*
+	Uart<1> serial;
+	serial.init(115200);
+	serial.println("INTERRUPTION PC1 MOTHERFUCKER !!!");
+	*/
+}
+
+
+
 /*
  *   Pingu in the Main !
  *      	  . --- .

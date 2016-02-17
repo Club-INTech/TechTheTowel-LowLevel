@@ -50,23 +50,16 @@ SensorMgr::SensorMgr():
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+
+
+/*     ________________________________
+	 *|								   |*
+	 *|Initialisation des interruptions|*
+	 *|________________________________|*
+*/
+
 	// Capteur porte DROITE OUVERTE (PC0)
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-
-	// Capteur porte GAUCHE OUVERTE (PC15)
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_15;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-	// Capteur porte DROITE FERMEE (PC13)
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_13;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
@@ -79,20 +72,29 @@ SensorMgr::SensorMgr():
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-/*     ________________________________
-	 *|								   |*
-	 *|Initialisation des interruptions|*
-	 *|________________________________|*
-*/
+	// Capteur porte DROITE FERMEE (PC13)
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_13;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+	// Capteur porte GAUCHE OUVERTE (PC15)
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_15;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStruct);
+
 
 
 	/*
 	 * Capteur de Test : PA6
 	 */
 
-	/* Activation de l'horloge du port A */
+	/* Activation de l'horloge du port A et C */
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
 	/* Activation de l'horloge du SYSCFG */
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
@@ -111,7 +113,7 @@ SensorMgr::SensorMgr():
 	/* PA6 is connected to EXTI_Line6 */
 	EXTI_InitStruct.EXTI_Line = EXTI_Line6;
 	/* Enable interrupt */
-	EXTI_InitStruct.EXTI_LineCmd = DISABLE;
+	EXTI_InitStruct.EXTI_LineCmd = DISABLE; // ici désactivée
 	/* Interrupt mode */
 	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
 	/* Triggers on rising and falling edge */
@@ -133,7 +135,94 @@ SensorMgr::SensorMgr():
 
 	ultrason.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);//On donne les paramètres de la pin et de l'interruption au capteur pour qu'il puisse les modifier sans faire d'erreur
 
+
+	/*
+	 * Gestion des capteurs de fin de course :
+	 */
+
+	/* Définit la pin à utiliser pour chaque line */
+		SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource0); // Porte droite ouverte
+		SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource1); // Porte gauche fermée
+		SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource13); // Porte droite fermée
+		SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource15); // Porte gauche ouverte
+
+// Initialise la line 0
+
+		EXTI_InitStruct.EXTI_Line = EXTI_Line0;
+		EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+		EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+		EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising; // déclenchement sur front montant
+		EXTI_Init(&EXTI_InitStruct);
+
+		/* Donne le channel correspondant */
+		NVIC_InitStruct.NVIC_IRQChannel = EXTI0_IRQn;
+		/* Set priority */
+		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
+		/* Set sub priority */
+		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
+		/* Enable interrupt */
+		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+		/* Add to NVIC */
+		NVIC_Init(&NVIC_InitStruct);
+
+// Initialise la line 1
+
+		EXTI_InitStruct.EXTI_Line = EXTI_Line1;
+		EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+		EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+		EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising; // déclenchement sur front montant
+		EXTI_Init(&EXTI_InitStruct);
+		/* Donne le channel correspondant */
+		NVIC_InitStruct.NVIC_IRQChannel = EXTI1_IRQn;
+		/* Set priority */
+		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
+		/* Set sub priority */
+		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
+		/* Enable interrupt */
+		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+		/* Add to NVIC */
+		NVIC_Init(&NVIC_InitStruct);
+
+
+// Initialise la line 13
+
+		EXTI_InitStruct.EXTI_Line = EXTI_Line13;
+		EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+		EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+		EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising; // déclenchement sur front montant
+		EXTI_Init(&EXTI_InitStruct);
+		/* Donne le channel correspondant */
+		NVIC_InitStruct.NVIC_IRQChannel = EXTI15_10_IRQn;
+		/* Set priority */
+		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
+		/* Set sub priority */
+		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
+		/* Enable interrupt */
+		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+		/* Add to NVIC */
+		NVIC_Init(&NVIC_InitStruct);
+
+
+// Initialise la line 15
+
+		EXTI_InitStruct.EXTI_Line = EXTI_Line15;
+		EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+		EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+		EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising; // déclenchement sur front montant
+		EXTI_Init(&EXTI_InitStruct);
+		/* Donne le channel correspondant */
+		NVIC_InitStruct.NVIC_IRQChannel = EXTI15_10_IRQn;
+		/* Set priority */
+		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
+		/* Set sub priority */
+		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
+		/* Enable interrupt */
+		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+		/* Add to NVIC */
+		NVIC_Init(&NVIC_InitStruct);
+
 }
+
 
 /*
  * Fonction de mise à jour des capteurs à ultrason
