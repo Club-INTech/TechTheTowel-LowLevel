@@ -33,6 +33,8 @@ public:
 private:
 	CapteurSRF ultrasonAVD;
 	CapteurSRF ultrasonAVG;
+	CapteurSRF ultrasonARG;
+	CapteurSRF ultrasonARD;
 
 	unsigned int refreshDelay;
 	unsigned int currentTime;
