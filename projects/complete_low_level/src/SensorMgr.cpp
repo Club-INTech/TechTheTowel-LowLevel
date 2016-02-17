@@ -308,7 +308,7 @@ void SensorMgr::sensorInterrupt(int pin){
  */
 
 int SensorMgr::getSensorDistanceAVG() {
-	return ultrasonAVG.value();
+	return 0;
 }
 
 /*
@@ -316,21 +316,21 @@ int SensorMgr::getSensorDistanceAVG() {
  */
 
 int SensorMgr::getSensorDistanceAVD() {
-	return ultrasonAVD.value();
+	return 0;
 }
 /*
  * Fonctions de récupération de la distance mesurée
  */
 
 int SensorMgr::getSensorDistanceARG() {
-	return 0;
+	return ultrasonAVG.value();
 }
 /*
  * Fonctions de récupération de la distance mesurée
  */
 
 int SensorMgr::getSensorDistanceARD() {
-	return 0;
+	return ultrasonAVD.value();
 }
 
 
