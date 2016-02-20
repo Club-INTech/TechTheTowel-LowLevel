@@ -20,8 +20,8 @@
 // ~1000 ticks par tour de roue
 // 17cm écartement des roues
 
-#define TICK_TO_MM 0.2077			// unité : mm/ticks
-#define TICK_TO_RADIAN 0.0014468	// unité : radians/ticks
+#define TICK_TO_MM 0.2088			// unité : mm/ticks
+#define TICK_TO_RADIAN 0.0014569	// unité : radians/ticks
 
 #define AVERAGE_SPEED_SIZE	25
 
@@ -148,6 +148,7 @@ private:
 	volatile bool leftSpeedControlled;
 	volatile bool rightSpeedControlled;
 
+
 	volatile bool curveMovement;
 
 	// Variables de réglage de la détection de blocage physique
@@ -218,6 +219,7 @@ public:
 	void enable(bool);
 	void enableTranslationControl(bool);
 	void enableRotationControl(bool);
+	void enableSpeedControl(bool);
 
 	void orderTranslation(int32_t);
 	void orderRotation(float, RotationWay);
