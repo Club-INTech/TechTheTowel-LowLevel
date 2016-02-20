@@ -259,11 +259,11 @@ void MotionControlSystem::control()
 	if(rightSpeedControlled)
 		rightSpeedPID.compute();	// Actualise la valeur de 'rightPWM'
 
-	//leftMotor.run(leftPWM);
-	//rightMotor.run(rightPWM);
 
-	leftMotor.run(255);
-	rightMotor.run(255);
+	leftMotor.run(leftPWM);
+	rightMotor.run(rightPWM);
+
+
 }
 
 bool MotionControlSystem::isPhysicallyStopped() {

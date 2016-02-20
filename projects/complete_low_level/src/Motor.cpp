@@ -6,20 +6,11 @@
  * Récapitulatif pins utilisées pour contrôler les deux moteurs :
  *
  * Gauche :
- * 	-pins de sens : PD10
- * 	-pin de pwm : PC6
+ * 	-pins de sens : PD14
+ * 	-pin de pwm : PB10
  * Droit :
  * 	-pins de sens : PD12
- * 	-pin de pwm : PC7
- *
- *	NOUVEAUX :
- *	Gauche :
- *	- pins de sens : PD14
- *	- pins de pwm : PB8
- *
- *	Droit :
- *	- pin de sens : PD12
- *	- pin de pwm : PB9
+ * 	-pin de pwm : PB11
  *
  */
 
@@ -30,7 +21,7 @@ Motor::Motor(Side s) :
 
 	/**
 	 * Configuration des pins pour le sens des moteurs
-	 * Gauche : PD14(IN2)
+	 * Gauche : PD14 (IN2)
 	 * Droite : PD12 (IN3)
 	 */
 
@@ -61,34 +52,33 @@ void Motor::initPWM(){
 	TIM_OCInitTypeDef TIM_OCInitStructure;
 
 	/**
-	 * Configuration des PWM générés sur les canaux 3 et 4 du TIMER4
+	 * Configuration des PWM générés sur les canaux 1 et 2 du TIMER2
 	 */
-	//Active l'horloge du TIMER 4
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
-	//Active l'horloge du port B
+	//Active l'horloge du TIMER 2
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+	//Active l'horloge du port C
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 
 	/**
 	 * Configuration pins PWM :
-	 * TIM4 CH3 (PB8 = moteur gauche) et TIM4 CH4 (PB9 = moteur droit)
+	 * TIM2 CH3 (PB10 = moteur gauche) et TIM2 CH4 (PB11 = moteur droit)
 	 *
 	 */
 
 	GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
-	//Connexion des 2 pins PB8 et PB9 à la fonction alternative liée au TIMER 4
+	//Connexion des 2 pins PC6 et PC7 à la fonction alternative liée au TIMER 8
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_TIM2);
 
-	GPIO_PinAFConfig(GPIOB, GPIO_PinSource8, GPIO_AF_TIM4);
-
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_11;
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
-	GPIO_PinAFConfig(GPIOB, GPIO_PinSource9, GPIO_AF_TIM4);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource11, GPIO_AF_TIM2);
 
 	/* -----------------------------------------------------------------------
 	 TIM3 Configuration: génère 2 PWM à deux rapports cycliques différents (un timer a 4 canaux,
@@ -122,7 +112,8 @@ void Motor::initPWM(){
 	 ----------------------------------------------------------------------- */
 
 	//Le prescaler peut être n'importe quel entier entre 1 et 65535 (uint16_t)
-	uint16_t prescaler = 190; //Adapté à un timer 16 bits
+	//Cette valeur sert à diviser la frequence processeur. Le timer compte jusqu'au prescaler avant de s'incrémenter de 1
+	uint16_t prescaler = (uint16_t) ((SystemCoreClock / 2) / 256000) - 1;
 
 	//Configuration du TIMER 4
 	TIM_TimeBaseStructure.TIM_Period = 10;//ancienne valeur = 255
@@ -130,7 +121,7 @@ void Motor::initPWM(){
 	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 
-	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
+	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
 
 	//Configuration du canal 3
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
@@ -139,37 +130,37 @@ void Motor::initPWM(){
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 	TIM_OCInitStructure.TIM_Pulse = 0; //Valeur du cycle initial
 
-	TIM_OC3Init(TIM4, &TIM_OCInitStructure);
-	TIM_OC3PreloadConfig(TIM4, TIM_OCPreload_Enable);
+	TIM_OC3Init(TIM2, &TIM_OCInitStructure);
+	TIM_OC3PreloadConfig(TIM2, TIM_OCPreload_Enable);
 
 	//Configuration du canal 4
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 	TIM_OCInitStructure.TIM_Pulse = 0; //Valeur du cycle initial
 
-	TIM_OC4Init(TIM4, &TIM_OCInitStructure);
-	TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable);
+	TIM_OC4Init(TIM2, &TIM_OCInitStructure);
+	TIM_OC4PreloadConfig(TIM2, TIM_OCPreload_Enable);
 
-	TIM_ARRPreloadConfig(TIM4, ENABLE);
+	TIM_ARRPreloadConfig(TIM2, ENABLE);
 
-	//Active le TIMER 4
-	TIM_Cmd(TIM4, ENABLE);
+	//Active le TIMER 2
+	TIM_Cmd(TIM2, ENABLE);
 }
 
 void Motor::run(int16_t pwm){
 	if (pwm >= 0) {
 		setDirection(Direction::FORWARD);
 		if (side == Side::LEFT) {
-			TIM4->CCR3 = MIN(pwm,255);
+			TIM2->CCR3 = MIN(pwm,255);
 		} else {
-			TIM4->CCR4 = MIN(pwm,255);
+			TIM2->CCR4 = MIN(pwm,255);
 		}
 
 	} else {
 		setDirection(Direction::BACKWARD);
 		if (side == Side::LEFT) {
-			TIM4->CCR3 = MIN(-pwm,255);
+			TIM2->CCR3 = MIN(-pwm,255);
 		} else {
-			TIM4->CCR4 = MIN(-pwm,255);
+			TIM2->CCR4 = MIN(-pwm,255);
 		}
 	}
 }
