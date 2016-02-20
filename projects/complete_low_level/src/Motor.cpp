@@ -122,7 +122,7 @@ void Motor::initPWM(){
 	 ----------------------------------------------------------------------- */
 
 	//Le prescaler peut être n'importe quel entier entre 1 et 65535 (uint16_t)
-	uint16_t prescaler = (uint16_t)((SystemCoreClock / 2) / 256000) - 1; //le deuxième /2 est dû au changement pour un timer de clock doublée
+	uint16_t prescaler = 190; //Adapté à un timer 16 bits
 
 	//Configuration du TIMER 4
 	TIM_TimeBaseStructure.TIM_Period = 10;//ancienne valeur = 255
@@ -130,7 +130,7 @@ void Motor::initPWM(){
 	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 
-	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
 
 	//Configuration du canal 3
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
@@ -159,17 +159,17 @@ void Motor::run(int16_t pwm){
 	if (pwm >= 0) {
 		setDirection(Direction::FORWARD);
 		if (side == Side::LEFT) {
-			TIM2->CCR1 = MIN(pwm,255);
+			TIM4->CCR3 = MIN(pwm,255);
 		} else {
-			TIM2->CCR2 = MIN(pwm,255);
+			TIM4->CCR4 = MIN(pwm,255);
 		}
 
 	} else {
 		setDirection(Direction::BACKWARD);
 		if (side == Side::LEFT) {
-			TIM2->CCR1 = MIN(-pwm,255);
+			TIM4->CCR3 = MIN(-pwm,255);
 		} else {
-			TIM2->CCR2 = MIN(-pwm,255);
+			TIM4->CCR4 = MIN(-pwm,255);
 		}
 	}
 }
@@ -177,9 +177,9 @@ void Motor::run(int16_t pwm){
 void Motor::setDirection(Direction dir) {
 	if (side == Side::LEFT) {
 		if (dir == Direction::FORWARD) {
-			GPIO_SetBits(GPIOD, GPIO_Pin_10);
+			GPIO_SetBits(GPIOD, GPIO_Pin_14);
 		} else {
-			GPIO_ResetBits(GPIOD, GPIO_Pin_10);
+			GPIO_ResetBits(GPIOD, GPIO_Pin_14);
 		}
 	} else {
 		if (dir == Direction::FORWARD) {
