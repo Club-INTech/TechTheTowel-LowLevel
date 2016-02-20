@@ -105,16 +105,16 @@ SensorMgr::SensorMgr():
 	/*Réglages de la pin*/
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	/* Tell system that you will use PA6 for EXTI_Line6 */
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource6);
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource5);
 
 	/* PA6 is connected to EXTI_Line6 */
-	EXTI_InitStruct.EXTI_Line = EXTI_Line6;
+	EXTI_InitStruct.EXTI_Line = EXTI_Line5;
 	/* Enable interrupt */
 	EXTI_InitStruct.EXTI_LineCmd = DISABLE; // ici désactivée
 	/* Interrupt mode */
@@ -151,16 +151,16 @@ SensorMgr::SensorMgr():
 	/*Réglages de la pin*/
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_7;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	/* Tell system that you will use PA6 for EXTI_Line6 */
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource4);
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource7);
 
 	/* PA6 is connected to EXTI_Line6 */
-	EXTI_InitStruct.EXTI_Line = EXTI_Line4;
+	EXTI_InitStruct.EXTI_Line = EXTI_Line7;
 	/* Enable interrupt */
 	EXTI_InitStruct.EXTI_LineCmd = DISABLE;
 	/* Interrupt mode */
@@ -172,7 +172,7 @@ SensorMgr::SensorMgr():
 
 	/* Add IRQ vector to NVIC */
 	/* PA6 is connected to EXTI_Line6, which has EXTI9_5_IRQn vector */
-	NVIC_InitStruct.NVIC_IRQChannel = EXTI4_IRQn;
+	NVIC_InitStruct.NVIC_IRQChannel = EXTI9_5_IRQn;
 	/* Set priority */
 	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
 	/* Set sub priority */
@@ -271,7 +271,7 @@ SensorMgr::SensorMgr():
 		/* Set sub priority */
 		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
 		/* Enable interrupt */
-		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+		NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
 		/* Add to NVIC */
 		NVIC_Init(&NVIC_InitStruct);
 
@@ -289,7 +289,7 @@ SensorMgr::SensorMgr():
 		/* Set sub priority */
 		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
 		/* Enable interrupt */
-		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+		NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
 		/* Add to NVIC */
 		NVIC_Init(&NVIC_InitStruct);
 
@@ -308,7 +308,7 @@ SensorMgr::SensorMgr():
 		/* Set sub priority */
 		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
 		/* Enable interrupt */
-		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+		NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
 		/* Add to NVIC */
 		NVIC_Init(&NVIC_InitStruct);
 
@@ -327,7 +327,7 @@ SensorMgr::SensorMgr():
 		/* Set sub priority */
 		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
 		/* Enable interrupt */
-		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+		NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
 		/* Add to NVIC */
 		NVIC_Init(&NVIC_InitStruct);
 

@@ -113,7 +113,7 @@ void Motor::initPWM(){
 
 	//Le prescaler peut être n'importe quel entier entre 1 et 65535 (uint16_t)
 	//Cette valeur sert à diviser la frequence processeur. Le timer compte jusqu'au prescaler avant de s'incrémenter de 1
-	uint16_t prescaler = (uint16_t) ((SystemCoreClock / 2) / 256000) - 1;
+	uint16_t prescaler = (uint16_t)((SystemCoreClock / 2) / 256000) - 1; //le deuxième /2 est dû au changement pour un timer de clock doublée
 
 	//Configuration du TIMER 4
 	TIM_TimeBaseStructure.TIM_Period = 10;//ancienne valeur = 255

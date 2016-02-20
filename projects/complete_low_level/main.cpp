@@ -711,35 +711,43 @@ void EXTI9_5_IRQHandler(void)
 	static SensorMgr* sensorMgr = &SensorMgr::Instance();
 
 	//Interruptions de l'ultrason de test
-    if (EXTI_GetITStatus(EXTI_Line6) != RESET) {
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
         sensorMgr->sensorInterrupt(6);
         //serial.printfln("interrupt 6");
         /* Clear interrupt flag */
-        EXTI_ClearITPendingBit(EXTI_Line6);
+        EXTI_ClearITPendingBit(EXTI_Line5);
     }
-}
+    if (EXTI_GetITStatus(EXTI_Line7) != RESET) {
+        sensorMgr->sensorInterrupt(4);
+        //serial.printfln("interrupt 6");
+        /* Clear interrupt flag */
+        EXTI_ClearITPendingBit(EXTI_Line7);
+    }
 
+}
+/*
 void EXTI0_IRQHandler(void) // Capteur fin de course droite ouverte
 {
-	/*
+
 	Uart<1> serial;
 	serial.init(115200);
 	serial.println("INTERRUPTION PC0 MOTHERFUCKER !!!");
-	*/
-}
 
+}
+*/
+/*
 void EXTI1_IRQHandler(void) // Capteur fin de course
 {
-	/*
+
 	Uart<1> serial;
 	serial.init(115200);
 	serial.println("INTERRUPTION PC1 MOTHERFUCKER !!!");
-	*/
+
 }
+*/
 
 
-
-
+/*
 void EXTI4_IRQHandler(void)
 {
 	static SensorMgr* sensorMgr = &SensorMgr::Instance();
@@ -747,10 +755,10 @@ void EXTI4_IRQHandler(void)
 	if (EXTI_GetITStatus(EXTI_Line4) != RESET) {
 	        sensorMgr->sensorInterrupt(4);
 	       // serial.printfln("interrupt 4");
-	        /* Clear interrupt flag */
+	        // Clear interrupt flag
 	        EXTI_ClearITPendingBit(EXTI_Line4);
 	    }
-}
+}*/
 
 /*
  *   Dead Pingu in the Main !

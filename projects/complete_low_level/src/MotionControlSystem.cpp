@@ -38,13 +38,13 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	// maxjerk = 1; // Valeur de jerk maxi(secousse d'accélération)
 
 	delayToStop = 100;
-	toleranceTranslation = 10;
-	toleranceRotation = 10;
+	toleranceTranslation = 30;
+	toleranceRotation = 30;
 
-	translationPID.setTunings(11, 0.00001, 0);
-	rotationPID.setTunings(15, 0.00001, 0);
-	leftSpeedPID.setTunings(0.0055, 0.00001, 0);
-	rightSpeedPID.setTunings(0.0055, 0.00001, 0);
+	translationPID.setTunings(11, 0., 0);
+	rotationPID.setTunings(15, 0, 0);
+	leftSpeedPID.setTunings(0.005, 0, 0);
+	rightSpeedPID.setTunings(0.005, 0, 0);
 
 	distanceTest = 200;
 
@@ -109,6 +109,7 @@ void MotionControlSystem::enableSpeedControl(bool enabled){
 
 void MotionControlSystem::control()
 {
+
 	// Pour le calcul de la vitesse instantanée :
 	static int32_t previousLeftTicks = 0;
 	static int32_t previousRightTicks = 0;
