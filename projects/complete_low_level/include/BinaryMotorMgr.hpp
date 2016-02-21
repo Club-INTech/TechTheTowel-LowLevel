@@ -34,7 +34,10 @@ public:
 	void stopLeftDoor();
 	void stopRightDoor();
 
-
+	bool isRightDoorOpen();
+	bool isLeftDoorOpen();
+	void setRightDoorOpen(bool);
+	void setLeftDoorOpen(bool);
 };
 
 #endif

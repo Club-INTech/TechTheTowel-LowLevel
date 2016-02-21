@@ -14,6 +14,7 @@ int main(void)
 	Uart<2> serial_ax;
 	serial.init(115200);
 	serial_ax.init(9600);
+	serial_ax.disable_rx();
 
 	MotionControlSystem* motionControlSystem = &MotionControlSystem::Instance(); // motionControlSystem est tout simplement un pointeur vers une référence d'un objet de type MotionControlSystem #TRIVIAL #USELESS
 	motionControlSystem->init();
@@ -25,6 +26,7 @@ int main(void)
 	char order[64];//Permet le stockage du message reçu par la liaison série
 
 	bool translation = true;//permet de basculer entre les réglages de cte d'asserv en translation et en rotation
+
 
 	while(1)
 	{
@@ -472,6 +474,7 @@ int main(void)
 				actuatorsMgr->fishingRight();
 			}
 
+
 			else if(!strcmp("mpr",order))
 			{
 				actuatorsMgr->midPositionRight();
@@ -594,11 +597,17 @@ int main(void)
 			/* --- Portes sable ---*/
 
 			else if(!strcmp("odl", order)) {
-				binaryMotorMgr->runForwardLeft();
+				bool value = binaryMotorMgr->isLeftDoorOpen();
+				if(!value){
+					binaryMotorMgr->runForwardLeft();
+				}
 			}
 
 			else if(!strcmp("odr", order)) {
-				binaryMotorMgr->runForwardRight();
+				bool value = binaryMotorMgr->isRightDoorOpen();
+				if(!value) {
+					binaryMotorMgr->runForwardRight();
+				}
 			}
 
 			else if(!strcmp("cdl", order)) {
@@ -636,8 +645,15 @@ int main(void)
 				binaryMotorMgr->stopAxisRight();
 			}
 
+			else if(!strcmp("irdo", order)) { // is Right Door Open
+				bool door = binaryMotorMgr->isRightDoorOpen();
+				serial.printfln("%d", door);
+			}
 
-
+			else if(!strcmp("ildo", order)) {
+				bool door = binaryMotorMgr->isLeftDoorOpen();
+				serial.printfln("%d", door);
+			}
 
 			/* ---Erreurs de communication : --- */
 
@@ -730,10 +746,12 @@ void EXTI0_IRQHandler(void) // Capteur fin de course droite ouverte
 {
 	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
 
-	binaryMotorMgr->stopRightDoor();
-	binaryMotorMgr->runAxisRight();
+	if(!binaryMotorMgr->isRightDoorOpen())
+	{
+		binaryMotorMgr->stopRightDoor();
+		binaryMotorMgr->setRightDoorOpen(true);
+	}
 	EXTI_ClearITPendingBit(EXTI_Line0);
-
 }
 
 /*
