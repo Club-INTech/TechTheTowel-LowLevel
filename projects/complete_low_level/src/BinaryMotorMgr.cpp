@@ -16,6 +16,9 @@ BinaryMotorMgr::BinaryMotorMgr() {
 		 * Porte Droite ouverture : PE13
 		 * Porte droite fermeture : PE15
 		 *
+		 * Enable porte Gauche : PB0
+		 * Enable porte Droite : PB2
+		 *
 		 * Axe gauche : PE5
 		 * Axe droit : PE3
 		 *
@@ -25,6 +28,7 @@ BinaryMotorMgr::BinaryMotorMgr() {
 		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 		// Active l'horloge du port D
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 
 
 			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
@@ -58,6 +62,16 @@ BinaryMotorMgr::BinaryMotorMgr() {
 			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 			GPIO_Init(GPIOE, &GPIO_InitStruct);
 
+			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_0;
+			GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+			GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_2;
+			GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+			GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 
 
 }
@@ -84,18 +98,22 @@ void BinaryMotorMgr::stopAxisRight() {
 /*--- Mouvement des portes ---*/
 
 void BinaryMotorMgr::runForwardLeft() {
+	GPIO_SetBits(GPIOB, GPIO_Pin_0);
 	GPIO_SetBits(GPIOE, GPIO_Pin_9);
 }
 
 void BinaryMotorMgr::runBackwardLeft() {
+	GPIO_SetBits(GPIOB, GPIO_Pin_0);
 	GPIO_SetBits(GPIOE, GPIO_Pin_11);
 }
 
 void BinaryMotorMgr::runForwardRight() {
+	GPIO_SetBits(GPIOB, GPIO_Pin_2);
 	GPIO_SetBits(GPIOE, GPIO_Pin_13);
 }
 
 void BinaryMotorMgr::runBackwardRight() {
+	GPIO_SetBits(GPIOB, GPIO_Pin_2);
 	GPIO_SetBits(GPIOE, GPIO_Pin_15);
 }
 

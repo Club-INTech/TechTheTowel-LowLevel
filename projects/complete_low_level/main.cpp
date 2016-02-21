@@ -725,16 +725,17 @@ void EXTI9_5_IRQHandler(void)
     }
 
 }
-/*
+
 void EXTI0_IRQHandler(void) // Capteur fin de course droite ouverte
 {
+	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
 
-	Uart<1> serial;
-	serial.init(115200);
-	serial.println("INTERRUPTION PC0 MOTHERFUCKER !!!");
+	binaryMotorMgr->stopRightDoor();
+	binaryMotorMgr->runAxisRight();
+	EXTI_ClearITPendingBit(EXTI_Line0);
 
 }
-*/
+
 /*
 void EXTI1_IRQHandler(void) // Capteur fin de course
 {

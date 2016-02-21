@@ -271,7 +271,7 @@ SensorMgr::SensorMgr():
 		/* Set sub priority */
 		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
 		/* Enable interrupt */
-		NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
+		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 		/* Add to NVIC */
 		NVIC_Init(&NVIC_InitStruct);
 
@@ -289,7 +289,7 @@ SensorMgr::SensorMgr():
 		/* Set sub priority */
 		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
 		/* Enable interrupt */
-		NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
+		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 		/* Add to NVIC */
 		NVIC_Init(&NVIC_InitStruct);
 
@@ -308,7 +308,7 @@ SensorMgr::SensorMgr():
 		/* Set sub priority */
 		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
 		/* Enable interrupt */
-		NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
+		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 		/* Add to NVIC */
 		NVIC_Init(&NVIC_InitStruct);
 
@@ -327,7 +327,7 @@ SensorMgr::SensorMgr():
 		/* Set sub priority */
 		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
 		/* Enable interrupt */
-		NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
+		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 		/* Add to NVIC */
 		NVIC_Init(&NVIC_InitStruct);
 
