@@ -27,7 +27,6 @@ int main(void)
 
 	bool translation = true;//permet de basculer entre les réglages de cte d'asserv en translation et en rotation
 
-
 	while(1)
 	{
 		sensorMgr->refresh();
@@ -754,13 +753,32 @@ void EXTI0_IRQHandler(void) // Capteur fin de course droite ouverte
 	EXTI_ClearITPendingBit(EXTI_Line0);
 }
 
+void EXTI15_10_IRQHandler(void) // Droite fermée
+{
+	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
+
+	if(EXTI_GetITStatus(EXTI_Line13) != RESET) {
+		if(binaryMotorMgr->isRightDoorOpen())
+		{
+			binaryMotorMgr->stopRightDoor();
+			binaryMotorMgr->setRightDoorOpen(false);
+		}
+		EXTI_ClearITPendingBit(EXTI_Line13);
+
+	}
+}
 /*
 void EXTI1_IRQHandler(void) // Capteur fin de course
 {
 
-	Uart<1> serial;
-	serial.init(115200);
-	serial.println("INTERRUPTION PC1 MOTHERFUCKER !!!");
+	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
+
+	if(binaryMotorMgr->isRightDoorOpen())
+	{
+		binaryMotorMgr->stopRightDoor();
+		binaryMotorMgr->setRightDoorOpen(false);
+	}
+	EXTI_ClearITPendingBit(EXTI_Line0);
 
 }
 */

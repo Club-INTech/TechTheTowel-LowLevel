@@ -78,6 +78,11 @@ BinaryMotorMgr::BinaryMotorMgr() {
 			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 			GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+			GPIO_ResetBits(GPIOE, GPIO_Pin_9);
+			GPIO_ResetBits(GPIOE, GPIO_Pin_11);
+			GPIO_ResetBits(GPIOE, GPIO_Pin_13);
+			GPIO_ResetBits(GPIOE, GPIO_Pin_15);
+
 			GPIO_SetBits(GPIOB, GPIO_Pin_0);
 			GPIO_SetBits(GPIOB, GPIO_Pin_2);
 
@@ -107,20 +112,25 @@ void BinaryMotorMgr::stopAxisRight() {
 void BinaryMotorMgr::runForwardLeft() {
 
 	GPIO_SetBits(GPIOE, GPIO_Pin_9);
+	GPIO_ResetBits(GPIOE, GPIO_Pin_11);
+
 }
 
 void BinaryMotorMgr::runBackwardLeft() {
 
 	GPIO_SetBits(GPIOE, GPIO_Pin_11);
+	GPIO_ResetBits(GPIOE, GPIO_Pin_9);
 }
 
 void BinaryMotorMgr::runForwardRight() {
 
+	GPIO_ResetBits(GPIOE, GPIO_Pin_15);
 	GPIO_SetBits(GPIOE, GPIO_Pin_13);
 }
 
 void BinaryMotorMgr::runBackwardRight() {
 
+	GPIO_ResetBits(GPIOE, GPIO_Pin_13);
 	GPIO_SetBits(GPIOE, GPIO_Pin_15);
 }
 
