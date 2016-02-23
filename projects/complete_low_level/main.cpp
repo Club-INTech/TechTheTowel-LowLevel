@@ -596,14 +596,14 @@ int main(void)
 			/* --- Portes sable ---*/
 
 			else if(!strcmp("odl", order)) {
-				bool value = binaryMotorMgr->isLeftDoorOpen();
+				bool value = sensorMgr->isLeftDoorOpen();
 				if(!value){
 					binaryMotorMgr->runForwardLeft();
 				}
 			}
 
 			else if(!strcmp("odr", order)) {
-				bool value = binaryMotorMgr->isRightDoorOpen();
+				bool value = sensorMgr->isRightDoorOpen();
 				if(!value) {
 					binaryMotorMgr->runForwardRight();
 				}
@@ -645,12 +645,22 @@ int main(void)
 			}
 
 			else if(!strcmp("irdo", order)) { // is Right Door Open
-				bool door = binaryMotorMgr->isRightDoorOpen();
+				bool door = sensorMgr->isRightDoorOpen();
 				serial.printfln("%d", door);
 			}
 
 			else if(!strcmp("ildo", order)) {
-				bool door = binaryMotorMgr->isLeftDoorOpen();
+				bool door = sensorMgr->isLeftDoorOpen();
+				serial.printfln("%d", door);
+			}
+
+			else if(!strcmp("irdc", order)) {
+				bool door = sensorMgr->isRightDoorClosed();
+				serial.printfln("%d", door);
+			}
+
+			else if(!strcmp("ildc", order)) {
+				bool door = sensorMgr->isLeftDoorClosed();
 				serial.printfln("%d", door);
 			}
 
@@ -745,7 +755,7 @@ void EXTI0_IRQHandler(void) // Capteur fin de course droite ouverte
 {
 	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
 
-	if(!binaryMotorMgr->isRightDoorOpen())
+	if(!binaryMotorMgr->getIsRightDoorOpen())
 	{
 		binaryMotorMgr->stopRightDoor();
 		binaryMotorMgr->setRightDoorOpen(true);
@@ -758,7 +768,7 @@ void EXTI15_10_IRQHandler(void) // Droite fermée
 	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
 
 	if(EXTI_GetITStatus(EXTI_Line13) != RESET) {
-		if(binaryMotorMgr->isRightDoorOpen())
+		if(binaryMotorMgr->getIsRightDoorOpen())
 		{
 			binaryMotorMgr->stopRightDoor();
 			binaryMotorMgr->setRightDoorOpen(false);

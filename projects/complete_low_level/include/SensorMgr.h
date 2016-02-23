@@ -24,6 +24,12 @@ public:
 	int getSensorDistanceAVD();
 	int getSensorDistanceARG();
 	int getSensorDistanceARD();
+
+	bool isRightDoorOpen();
+	bool isLeftDoorOpen();
+	bool isRightDoorClosed();
+	bool isLeftDoorClosed();
+
 	bool isJumperOut() const;
 
 	void refresh();

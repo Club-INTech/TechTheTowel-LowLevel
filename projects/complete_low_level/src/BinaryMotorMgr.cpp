@@ -149,13 +149,6 @@ void BinaryMotorMgr::stopRightDoor() {
 
 /*--- Etat des portes ---*/
 
-bool BinaryMotorMgr::isRightDoorOpen() {
-		return rightDoorOpen;
-}
-
-bool BinaryMotorMgr::isLeftDoorOpen() {
-		return leftDoorOpen;
-}
 
 void BinaryMotorMgr::setRightDoorOpen(bool value) {
 	rightDoorOpen = value;
@@ -163,4 +156,12 @@ void BinaryMotorMgr::setRightDoorOpen(bool value) {
 
 void BinaryMotorMgr::setLeftDoorOpen(bool value) {
 	leftDoorOpen = value;
+}
+
+bool BinaryMotorMgr::getIsLeftDoorOpen() {
+	return leftDoorOpen;
+}
+
+bool BinaryMotorMgr::getIsRightDoorOpen() {
+	return rightDoorOpen;
 }
