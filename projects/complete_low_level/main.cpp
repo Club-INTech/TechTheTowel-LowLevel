@@ -597,24 +597,35 @@ int main(void)
 
 			else if(!strcmp("odl", order)) {
 				bool value = sensorMgr->isLeftDoorOpen();
-				if(!value){
-					binaryMotorMgr->runForwardLeft();
+				if(!value){ // Si la porte n'est pas en fin de course ouverte
+					binaryMotorMgr->setLeftDoorOpening(true);
+					binaryMotorMgr->runForwardLeft(); //ouvrir
+
 				}
 			}
 
 			else if(!strcmp("odr", order)) {
 				bool value = sensorMgr->isRightDoorOpen();
 				if(!value) {
+					binaryMotorMgr->setRightDoorOpening(true);
 					binaryMotorMgr->runForwardRight();
 				}
 			}
 
 			else if(!strcmp("cdl", order)) {
-				binaryMotorMgr->runBackwardLeft();
+				bool value = sensorMgr->isLeftDoorClosed();
+					if(!value) {
+						binaryMotorMgr->setLeftDoorClosing(true);
+						binaryMotorMgr->runBackwardLeft();
+					}
 			}
 
 			else if(!strcmp("cdr", order)) {
-				binaryMotorMgr->runBackwardRight();
+				bool value = sensorMgr->isRightDoorClosed();
+					if(!value) {
+						binaryMotorMgr->setRightDoorClosing(true);
+						binaryMotorMgr->runBackwardRight();
+					}
 			}
 
 			else if(!strcmp("sdr", order)) {
@@ -686,6 +697,8 @@ int main(void)
 			serial.printfln("CRITICAL OVERFLOW !");
 			motionControlSystem->enableTranslationControl(false);
 			motionControlSystem->enableRotationControl(false);
+			motionControlSystem->enableSpeedControl(false);
+
 			while(true)
 				;
 		}
@@ -751,47 +764,54 @@ void EXTI9_5_IRQHandler(void)
 
 }
 
-void EXTI0_IRQHandler(void) // Capteur fin de course droite ouverte
+void EXTI0_IRQHandler(void) // Capteur fin de course Droite ouverte
 {
 	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
 
-	if(!binaryMotorMgr->getIsRightDoorOpen())
-	{
-		binaryMotorMgr->stopRightDoor();
-		binaryMotorMgr->setRightDoorOpen(true);
+	if(!binaryMotorMgr->isRightDoorClosing()){ // Sécurité : N'arrete pas le moteur il est en train d'ouvrir (problème de front montant du capteur)
+		binaryMotorMgr->stopRightDoor(); // stopper sur front montant
+		binaryMotorMgr->setRightDoorOpening(false);
 	}
 	EXTI_ClearITPendingBit(EXTI_Line0);
 }
 
-void EXTI15_10_IRQHandler(void) // Droite fermée
+void EXTI15_10_IRQHandler(void)
 {
 	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
 
-	if(EXTI_GetITStatus(EXTI_Line13) != RESET) {
-		if(binaryMotorMgr->getIsRightDoorOpen())
-		{
+	if(EXTI_GetITStatus(EXTI_Line13) != RESET) { // Droite fermée
+		if(!binaryMotorMgr->isRightDoorOpening()){
+
 			binaryMotorMgr->stopRightDoor();
-			binaryMotorMgr->setRightDoorOpen(false);
+			binaryMotorMgr->setRightDoorClosing(false);
 		}
 		EXTI_ClearITPendingBit(EXTI_Line13);
+	}
+	else if(EXTI_GetITStatus(EXTI_Line15) != RESET) { // Gauche ouverte
+		if(!binaryMotorMgr->isLeftDoorClosing()){
 
+			binaryMotorMgr->stopLeftDoor();
+			binaryMotorMgr->setLeftDoorOpening(false);
+		}
+		EXTI_ClearITPendingBit(EXTI_Line15);
 	}
 }
-/*
-void EXTI1_IRQHandler(void) // Capteur fin de course
+
+
+void EXTI1_IRQHandler(void) // Gauche fermée
 {
 
 	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
 
-	if(binaryMotorMgr->isRightDoorOpen())
+	if(!binaryMotorMgr->isLeftDoorOpening())
 	{
-		binaryMotorMgr->stopRightDoor();
-		binaryMotorMgr->setRightDoorOpen(false);
+		binaryMotorMgr->stopLeftDoor();
+		binaryMotorMgr->setLeftDoorClosing(false);
 	}
-	EXTI_ClearITPendingBit(EXTI_Line0);
+	EXTI_ClearITPendingBit(EXTI_Line1);
 
 }
-*/
+
 
 
 /*

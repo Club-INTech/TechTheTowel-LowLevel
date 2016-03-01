@@ -427,7 +427,7 @@ bool SensorMgr::isJumperOut() const{
 }
 
 bool SensorMgr::isLeftDoorOpen() {
-	return GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_1);
+	return GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_15);
 }
 
 bool SensorMgr::isRightDoorOpen() {
@@ -435,7 +435,7 @@ bool SensorMgr::isRightDoorOpen() {
 }
 
 bool SensorMgr::isLeftDoorClosed() {
-	return GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_15);
+	return GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_1);
 }
 
 bool SensorMgr::isRightDoorClosed() {
