@@ -37,9 +37,9 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 
 	// maxjerk = 1; // Valeur de jerk maxi(secousse d'accélération)
 
-	delayToStop = 100;
-	toleranceTranslation = 30;
-	toleranceRotation = 30;
+	delayToStop = 200;
+	toleranceTranslation = 50;
+	toleranceRotation = 50;
 
 	translationPID.setTunings(13, 0, 0);
 	rotationPID.setTunings(14, 0, 0);
@@ -399,6 +399,18 @@ void MotionControlSystem::orderCurveTrajectory(float arcLength, float curveRadiu
 
 	leftCurveRatio = (ABS(curveRadius)-radiusDiff)/ABS(curveRadius);
 	rightCurveRatio = (ABS(curveRadius)+radiusDiff)/ABS(curveRadius);
+
+	if(MAX(leftCurveRatio, rightCurveRatio) > 1.0)
+	{
+		float offset = 1.0 - MAX(leftCurveRatio, rightCurveRatio);
+		leftCurveRatio -= offset;
+		rightCurveRatio -= offset;
+	}
+
+	if(leftCurveRatio<0)
+		leftCurveRatio=0;
+	if(rightCurveRatio<0)
+		rightCurveRatio=0;
 
 	enableRotationControl(false);
 	curveMovement = true;
