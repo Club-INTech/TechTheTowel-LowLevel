@@ -852,7 +852,7 @@ void EXTI1_IRQHandler(void) // Gauche fermée
 
 
 
-/*
+
 void EXTI4_IRQHandler(void)
 {
 	static SensorMgr* sensorMgr = &SensorMgr::Instance();
@@ -863,7 +863,7 @@ void EXTI4_IRQHandler(void)
 	        // Clear interrupt flag
 	        EXTI_ClearITPendingBit(EXTI_Line4);
 	    }
-}*/
+}
 
 /*
  *   Dead Pingu in the Main !

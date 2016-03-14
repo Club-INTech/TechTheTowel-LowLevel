@@ -55,6 +55,7 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 
 	distanceTest = 200;
 
+
 }
 
 void MotionControlSystem::init() {
