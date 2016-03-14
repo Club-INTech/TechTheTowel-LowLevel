@@ -39,19 +39,14 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 
 	// maxjerk = 1; // Valeur de jerk maxi(secousse d'accélération)
 
-<<<<<<< HEAD
 	delayToStop = 100; // temps à l'arrêt avant de considérer un blocage
 	delayToStopCurve = 500; // pareil en courbe
 	toleranceTranslation = 30;
-	toleranceRotation = 30;
-	toleranceSpeed = 30;
+	toleranceRotation = 50;
+	toleranceSpeed = 50;
 	toleranceSpeedEstablished = 50; // Doit être la plus petite possible, sans bloquer les trajectoires courbes
 	delayToEstablish = 1000;
-=======
-	delayToStop = 200;
-	toleranceTranslation = 50;
-	toleranceRotation = 50;
->>>>>>> 21374476d6f697170c87718b8ddd05be940f2983
+
 
 	translationPID.setTunings(13, 0, 0);
 	rotationPID.setTunings(14, 0, 0);
@@ -119,6 +114,27 @@ void MotionControlSystem::enableSpeedControl(bool enabled){
 	rightSpeedControlled = enabled;
 }
 
+
+void MotionControlSystem::setRawPositiveTranslationSpeed(){
+	translationSpeed = maxSpeedTranslation;
+}
+
+void MotionControlSystem::setRawPositiveRotationSpeed(){
+	rotationSpeed = maxSpeedRotation;
+}
+
+void MotionControlSystem::setRawNegativeTranslationSpeed(){
+	translationSpeed = -maxSpeedTranslation;
+}
+
+void MotionControlSystem::setRawNegativeRotationSpeed(){
+	rotationSpeed = -maxSpeedRotation;
+}
+
+void MotionControlSystem::setRawNullSpeed(){
+	rotationSpeed = 0;
+	translationSpeed =0;
+}
 
 void MotionControlSystem::control()
 {

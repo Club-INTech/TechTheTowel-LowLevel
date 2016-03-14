@@ -212,6 +212,12 @@ public:
 
 	void init();
 
+	void setRawPositiveTranslationSpeed();
+	void setRawNegativeTranslationSpeed();
+	void setRawPositiveRotationSpeed();
+	void setRawNegativeRotationSpeed();
+	void setRawNullSpeed();
+
 	void control();
 	void updatePosition();
 	void manageStop();

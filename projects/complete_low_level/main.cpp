@@ -189,6 +189,38 @@ int main(void)
 
 
 
+			// POUR MONTLHERY
+
+			else if(!strcmp("montlhery", order))
+			{
+				motionControlSystem->enableTranslationControl(false);
+				motionControlSystem->enableRotationControl(false);
+			}
+
+			else if(!strcmp("av", order))
+			{
+				motionControlSystem->setRawPositiveTranslationSpeed();
+			}
+
+			else if(!strcmp("rc", order))
+			{
+				motionControlSystem->setRawNegativeTranslationSpeed();
+			}
+
+			else if(!strcmp("td", order))
+			{
+				motionControlSystem->setRawNegativeRotationSpeed();
+			}
+
+			else if(!strcmp("tg", order))
+			{
+				motionControlSystem->setRawPositiveRotationSpeed();
+			}
+
+			else if(!strcmp("sstop", order)) // Stoppe l'asserv en vitesse
+			{
+				motionControlSystem->setRawNullSpeed();
+			}
 
 
 /*			 __________________
