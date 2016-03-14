@@ -22,10 +22,12 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	moving = false;
 	moveAbnormal = false;
 	curveMovement = false;
+	forcedMovement = false;
 	direction = NONE;
 
 	leftCurveRatio = 1.0;
 	rightCurveRatio = 1.0;
+	previousCurveRadius = 300;
 
 	leftSpeedPID.setOutputLimits(-255,255);
 	rightSpeedPID.setOutputLimits(-255,255);
@@ -37,9 +39,13 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 
 	// maxjerk = 1; // Valeur de jerk maxi(secousse d'accélération)
 
-	delayToStop = 100;
+	delayToStop = 100; // temps à l'arrêt avant de considérer un blocage
+	delayToStopCurve = 500; // pareil en courbe
 	toleranceTranslation = 30;
 	toleranceRotation = 30;
+	toleranceSpeed = 30;
+	toleranceSpeedEstablished = 50; // Doit être la plus petite possible, sans bloquer les trajectoires courbes
+	delayToEstablish = 1000;
 
 	translationPID.setTunings(13, 0, 0);
 	rotationPID.setTunings(14, 0, 0);
@@ -107,6 +113,7 @@ void MotionControlSystem::enableSpeedControl(bool enabled){
 	rightSpeedControlled = enabled;
 }
 
+
 void MotionControlSystem::control()
 {
 
@@ -160,6 +167,9 @@ void MotionControlSystem::control()
 
 	averageLeftSpeed.add(currentLeftSpeed);
 	averageRightSpeed.add(currentRightSpeed);
+
+	averageLeftDerivativeError.add(ABS(leftSpeedPID.getDerivativeError()));		// Mise à jour des moyennes de dérivées de l'erreur (pour les blocages)
+	averageRightDerivativeError.add(ABS(rightSpeedPID.getDerivativeError()));
 
 	currentLeftSpeed = averageLeftSpeed.value(); // On utilise pour l'asserv la valeur moyenne des dernieres current Speed
 	currentRightSpeed = averageRightSpeed.value();
@@ -267,15 +277,48 @@ void MotionControlSystem::control()
 
 }
 
+
 bool MotionControlSystem::isPhysicallyStopped() {
 	return (translationPID.getDerivativeError() == 0) && (rotationPID.getDerivativeError() == 0);
 }
 
+
+bool MotionControlSystem::isLeftWheelSpeedAbnormal() {
+	return (ABS(leftSpeedPID.getError())>toleranceSpeedEstablished);
+}
+
+bool MotionControlSystem::isRightWheelSpeedAbnormal() {
+	return (ABS(rightSpeedPID.getError())>toleranceSpeedEstablished);
+}
+
+void MotionControlSystem::enableForcedMovement(){
+	forcedMovement=true;
+}
+
+void MotionControlSystem::disableForcedMovement(){
+	forcedMovement=false;
+}
+
+
 void MotionControlSystem::manageStop()
 {
 	static uint32_t time = 0;
+	static uint32_t time2 = 0;
+	static uint32_t time3 = 0;
+	static uint32_t timeToEstablish = 0;
+	static bool isSpeedEstablished = false;
 
-	if (isPhysicallyStopped() && moving)
+	if (moving && averageLeftDerivativeError.value()<toleranceSpeedEstablished && averageRightDerivativeError.value()<toleranceSpeedEstablished && leftSpeedPID.getError()<toleranceSpeed && rightSpeedPID.getError()<toleranceSpeed && !forcedMovement){
+		if(timeToEstablish==0){
+			timeToEstablish=Millis();
+		}
+		else if(timeToEstablish>delayToEstablish && !isSpeedEstablished){
+			isSpeedEstablished = true;
+		}
+	}
+
+
+	if (isPhysicallyStopped() && moving && !curveMovement && !forcedMovement) // Pour un blocage classique
 	{
 
 		if (time == 0)
@@ -299,9 +342,52 @@ void MotionControlSystem::manageStop()
 			}
 		}
 	}
+	else if ((isLeftWheelSpeedAbnormal() || isRightWheelSpeedAbnormal()) && curveMovement) // Sert a vérifier que les consignes de vitesse sont bien respectées (blocage pour les trajectoires courbes)
+	{
+		if (time2 == 0)
+				{ //Début du timer
+					time2 = Millis();
+				}
+				else
+				{
+					if (ABS(translationPID.getError()) <= toleranceTranslation && ABS(rotationPID.getError()) <= toleranceRotation)
+						{ //Stoppé pour cause de fin de mouvement
+							stop();
+							isSpeedEstablished = false;
+							moveAbnormal = false;
+						}
+					else if (((Millis() - time2) >= delayToStopCurve) && isSpeedEstablished){
+
+						stop();
+						isSpeedEstablished = false;
+						moveAbnormal = true;
+
+						}
+				}
+	}
+
+	else if (forcedMovement){
+
+		if (time3 == 0)
+				{
+					time3 = Millis();
+				}
+				else
+				{
+					if ((Millis() - time3) >= delayToStop){
+						if (ABS(translationPID.getError()) <= toleranceTranslation && ABS(rotationPID.getError()) <= toleranceRotation)
+										{ //Stopé pour cause de fin de mouvement
+											stop();
+											moveAbnormal = false;
+										}
+						}
+				}
+		}
+
 	else
 	{
 		time = 0;
+		time2 =0;
 		if(moving)
 			moveAbnormal = false;
 	}
@@ -391,6 +477,7 @@ void MotionControlSystem::orderRotation(float angleConsigneRadian, RotationWay r
 
 void MotionControlSystem::orderCurveTrajectory(float arcLength, float curveRadius)
 {
+	previousCurveRadius = curveRadius;
 	float radiusDiff = WHEEL_DISTANCE_TO_CENTER;
 	float finalAngle = (arcLength / ABS(curveRadius)) + getAngleRadian();
 
@@ -416,6 +503,7 @@ void MotionControlSystem::orderRawPwm(Side side, int16_t pwm) {
 }
 
 void MotionControlSystem::stop() {
+
 	translationSetpoint = currentDistance;
 	rotationSetpoint = currentAngle;
 	leftSpeedSetpoint = 0;

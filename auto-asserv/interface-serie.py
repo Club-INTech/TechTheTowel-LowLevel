@@ -18,7 +18,7 @@ class serialCom:
     def ping(self):
         
         self.port_serie.write("?\r\n")
-    
+          
     def ecouter(self):
         a=self.port_serie.readline() 
         #print a

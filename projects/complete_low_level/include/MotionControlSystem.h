@@ -24,6 +24,7 @@
 #define TICK_TO_RADIAN 0.0014569	// unité : radians/ticks
 
 #define AVERAGE_SPEED_SIZE	25
+#define AVERAGE_DERIVATIVE_SIZE 100
 
 #define WHEEL_DISTANCE_TO_CENTER 145.1
 #define TOLERANCY 50
@@ -106,6 +107,7 @@ private:
 	//Les ratios de vitesse pour commander un déplacement courbe
 	volatile float leftCurveRatio;
 	volatile float rightCurveRatio;
+	float previousCurveRadius;
 
 
 	/*
@@ -116,6 +118,10 @@ private:
 	//	Pour faire de jolies courbes de réponse du système, la vitesse moyenne c'est mieux !
 	Average<int32_t, AVERAGE_SPEED_SIZE> averageLeftSpeed;
 	Average<int32_t, AVERAGE_SPEED_SIZE> averageRightSpeed;
+
+	//Moyennes de la dérivée des erreurs (pour detecter blocages)
+	Average<int32_t, AVERAGE_DERIVATIVE_SIZE> averageLeftDerivativeError;
+	Average<int32_t, AVERAGE_DERIVATIVE_SIZE> averageRightDerivativeError;
 
 
 
@@ -150,14 +156,20 @@ private:
 
 
 	volatile bool curveMovement;
+	volatile bool forcedMovement; // Si true, alors pas de gestion de l'arret : ON FORCE MODAFUCKA !!!
 
 	// Variables de réglage de la détection de blocage physique
-	unsigned int delayToStop;//En ms
+	unsigned int delayToStop;  //En ms
+	unsigned int delayToStopCurve;
 
 	//Nombre de ticks de tolérance pour considérer qu'on est arrivé à destination
 	int toleranceTranslation;
 	int toleranceRotation;
 
+	int toleranceSpeed; // Tolérance avant de considérer le mouvement anormal (écart entre la consigne de vitesse et la vitesse réelle)
+	int toleranceSpeedEstablished; // Tolérance autour de la vitesse établie avant de capter un blocage
+
+	int delayToEstablish; // Temps à attendre avant de considérer la vitesse stable
 
 	/*
 	 * Dispositif d'enregistrement de l'état du système pour permettre le débug
@@ -192,7 +204,8 @@ private:
 	unsigned int trackerCursor;
 
 	bool isPhysicallyStopped();//Indique si le robot est immobile.
-
+	bool isLeftWheelSpeedAbnormal();
+	bool isRightWheelSpeedAbnormal();
 
 public:
 	MotionControlSystem();
@@ -202,6 +215,9 @@ public:
 	void control();
 	void updatePosition();
 	void manageStop();
+
+	void enableForcedMovement();
+	void disableForcedMovement();
 
 	void track();//Stock les valeurs de débug
 	void printTrackingAll();//Affiche l'intégralité du tableau de tracking

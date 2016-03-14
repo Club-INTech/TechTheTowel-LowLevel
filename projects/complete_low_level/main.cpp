@@ -95,6 +95,16 @@ int main(void)
 				motionControlSystem->orderCurveTrajectory(arcLenght, curveRadius);
 			}
 
+			else if(!strcmp("efm", order)) // Activer les mouvements forcés (sans blocage)
+			{
+				motionControlSystem->enableForcedMovement();
+			}
+
+			else if(!strcmp("dfm", order)) // désactive le forçage
+			{
+				motionControlSystem->disableForcedMovement();
+			}
+
 
 			else if(!strcmp("t3", order))		//Ordre de rotation via un angle relatif (en radians)
 			{
@@ -720,12 +730,8 @@ void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 		//Asservissement et mise à jour de la position
 		motionControlSystem->control();
 		motionControlSystem->updatePosition();
+		motionControlSystem->manageStop();
 
-		if (i >= 10) { //5ms
-			//Gestion de l'arrêt
-			motionControlSystem->manageStop();
-			i = 0;
-		}
 
 		if(j >= 5){ //2.5ms
 			motionControlSystem->track();
