@@ -92,7 +92,7 @@ SensorMgr::SensorMgr():
 
 
 	/*
-	 * Capteur US AVD : PA6
+	 * Capteur US AVD : PA5
 	 */
 
 	/* Activation de l'horloge du port A et C */
@@ -110,13 +110,13 @@ SensorMgr::SensorMgr():
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-	/* Tell system that you will use PA6 for EXTI_Line6 */
+	/* Tell system that you will use PA5 for EXTI_Line5 */
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource5);
 
-	/* PA6 is connected to EXTI_Line6 */
+	/* PA6 is connected to EXTI_Line5 */
 	EXTI_InitStruct.EXTI_Line = EXTI_Line5;
 	/* Enable interrupt */
-	EXTI_InitStruct.EXTI_LineCmd = DISABLE; // ici désactivée
+	EXTI_InitStruct.EXTI_LineCmd = DISABLE;
 	/* Interrupt mode */
 	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
 	/* Triggers on rising and falling edge */
@@ -139,7 +139,7 @@ SensorMgr::SensorMgr():
 	ultrasonAVD.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);//On donne les paramètres de la pin et de l'interruption au capteur pour qu'il puisse les modifier sans faire d'erreur
 
 	/*
-	 * Capteur US AVG : PA4
+	 * Capteur US AVG : PA7
 	 */
 
 	/* Activation de l'horloge du port A */
@@ -156,10 +156,10 @@ SensorMgr::SensorMgr():
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-	/* Tell system that you will use PA6 for EXTI_Line6 */
+	/* Tell system that you will use PA7 for EXTI_Line7 */
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource7);
 
-	/* PA6 is connected to EXTI_Line6 */
+	/* PA7 is connected to EXTI_Line7 */
 	EXTI_InitStruct.EXTI_Line = EXTI_Line7;
 	/* Enable interrupt */
 	EXTI_InitStruct.EXTI_LineCmd = DISABLE;
@@ -171,10 +171,10 @@ SensorMgr::SensorMgr():
 	EXTI_Init(&EXTI_InitStruct);
 
 	/* Add IRQ vector to NVIC */
-	/* PA6 is connected to EXTI_Line6, which has EXTI9_5_IRQn vector */
+	/* PA7 is connected to EXTI_Line7, which has EXTI9_5_IRQn vector */
 	NVIC_InitStruct.NVIC_IRQChannel = EXTI9_5_IRQn;
 	/* Set priority */
-	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
+	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x01;
 	/* Set sub priority */
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x01;
 	/* Enable interrupt */
@@ -184,68 +184,69 @@ SensorMgr::SensorMgr():
 
 	ultrasonAVG.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);
 
-	/*
-	 * Capteur US ARG :
-	 */
-	/*
-			RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 
-			RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+	  // Capteur US ARG :
 
-			GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
-			GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-			GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
-			GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
-			GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-			GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-			SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource4);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 
-			EXTI_InitStruct.EXTI_Line = EXTI_Line4;
-			EXTI_InitStruct.EXTI_LineCmd = DISABLE;
-			EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-			EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
-			EXTI_Init(&EXTI_InitStruct);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
-			NVIC_InitStruct.NVIC_IRQChannel = EXTI4_IRQn;
-			NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
-			NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x01;
-			NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-			NVIC_Init(&NVIC_InitStruct);
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-			ultrasonARG.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);
-	*/
-	/*
-	 * Capteur US ARD :
-	 */
-/*
-		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource4);
 
-		RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+	EXTI_InitStruct.EXTI_Line = EXTI_Line4;
+	EXTI_InitStruct.EXTI_LineCmd = DISABLE;
+	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_Init(&EXTI_InitStruct);
 
-		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
-		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
-		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
-		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
-		GPIO_Init(GPIOA, &GPIO_InitStruct);
+	NVIC_InitStruct.NVIC_IRQChannel = EXTI4_IRQn;
+	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
+	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
+	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStruct);
 
-		SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource4);
+	ultrasonARG.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);
 
-		EXTI_InitStruct.EXTI_Line = EXTI_Line4;
-		EXTI_InitStruct.EXTI_LineCmd = DISABLE;
-		EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-		EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
-		EXTI_Init(&EXTI_InitStruct);
+	 // Capteur US ARD :
 
-		NVIC_InitStruct.NVIC_IRQChannel = EXTI4_IRQn;
-		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
-		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x01;
-		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-		NVIC_Init(&NVIC_InitStruct);
 
-		ultrasonARD.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);
-		*/
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource6);
+
+	EXTI_InitStruct.EXTI_Line = EXTI_Line6;
+	EXTI_InitStruct.EXTI_LineCmd = DISABLE;
+	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_Init(&EXTI_InitStruct);
+
+	NVIC_InitStruct.NVIC_IRQChannel = EXTI9_5_IRQn;
+	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x02;
+	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x02;
+	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStruct);
+
+	ultrasonARD.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);
+
+
+
 	/*
 	 * Gestion des capteurs de fin de course :
 	 */
@@ -352,7 +353,7 @@ void SensorMgr::refresh()
 		{
 			ultrasonAVD.refresh();
 		}
-	/*	if (capteur == 2)
+		if (capteur == 2)
 		{
 			ultrasonARG.refresh();
 		}
@@ -360,7 +361,7 @@ void SensorMgr::refresh()
 		{
 			ultrasonARD.refresh();
 		}
-		*/
+
 		capteur = (capteur+1)%4;
 		lastRefreshTime = currentTime;
 	}
@@ -373,13 +374,13 @@ void SensorMgr::refresh()
 
 void SensorMgr::sensorInterrupt(int pin){
 	if(pin == 4)
-		ultrasonAVG.interruption();
-	else if(pin == 6)
-		ultrasonAVD.interruption();
-	else if(pin == 8)
 		ultrasonARG.interruption();
-	else if(pin == 9)
+	else if(pin == 6)
 		ultrasonARD.interruption();
+	else if(pin == 5)
+		ultrasonAVD.interruption();
+	else if(pin == 7)
+		ultrasonAVG.interruption();
 }
 
 
@@ -388,8 +389,8 @@ void SensorMgr::sensorInterrupt(int pin){
  */
 
 int SensorMgr::getSensorDistanceAVG() {
-	//return ultrasonARG.value();
-	return 0;
+	return ultrasonAVG.value();
+
 }
 
 /*
@@ -397,22 +398,22 @@ int SensorMgr::getSensorDistanceAVG() {
  */
 
 int SensorMgr::getSensorDistanceAVD() {
-	//return ultrasonARD.value();
-	return 0;
+	return ultrasonAVD.value();
+
 }
 /*
  * Fonctions de récupération de la distance mesurée
  */
 
 int SensorMgr::getSensorDistanceARG() {
-	return ultrasonAVG.value();
+	return ultrasonARG.value();
 }
 /*
  * Fonctions de récupération de la distance mesurée
  */
 
 int SensorMgr::getSensorDistanceARD() {
-	return ultrasonAVD.value();
+	return ultrasonARD.value();
 }
 
 

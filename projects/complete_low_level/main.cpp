@@ -788,17 +788,23 @@ void EXTI9_5_IRQHandler(void)
 
 	//Interruptions de l'ultrason de test
     if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
-        sensorMgr->sensorInterrupt(6);
+        sensorMgr->sensorInterrupt(5);
         //serial.printfln("interrupt 6");
         /* Clear interrupt flag */
         EXTI_ClearITPendingBit(EXTI_Line5);
     }
     if (EXTI_GetITStatus(EXTI_Line7) != RESET) {
-        sensorMgr->sensorInterrupt(4);
+        sensorMgr->sensorInterrupt(7);
         //serial.printfln("interrupt 6");
         /* Clear interrupt flag */
         EXTI_ClearITPendingBit(EXTI_Line7);
     }
+    if (EXTI_GetITStatus(EXTI_Line6) != RESET) {
+           sensorMgr->sensorInterrupt(6);
+           //serial.printfln("interrupt 6");
+           /* Clear interrupt flag */
+           EXTI_ClearITPendingBit(EXTI_Line6);
+       }
 
 }
 
