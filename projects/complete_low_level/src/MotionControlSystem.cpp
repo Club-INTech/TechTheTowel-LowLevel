@@ -513,8 +513,8 @@ void MotionControlSystem::orderCurveTrajectory(float arcLength, float curveRadiu
 	if(MAX(leftCurveRatio, rightCurveRatio) > 1.0)
 	{
 		float offset = 1.0 - MAX(leftCurveRatio, rightCurveRatio);
-		leftCurveRatio -= offset;
-		rightCurveRatio -= offset;
+		leftCurveRatio = MAX(leftCurveRatio+offset,0);
+		rightCurveRatio = MAX(rightCurveRatio+offset,0);
 	}
 
 	if(leftCurveRatio<0)
