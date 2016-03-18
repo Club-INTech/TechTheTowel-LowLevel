@@ -762,11 +762,11 @@ void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 		//Asservissement et mise à jour de la position
 		motionControlSystem->control();
 		motionControlSystem->updatePosition();
-		motionControlSystem->manageStop();
 
 
 		if(j >= 5){ //2.5ms
 			motionControlSystem->track();
+			motionControlSystem->manageStop();
 			j=0;
 		}
 

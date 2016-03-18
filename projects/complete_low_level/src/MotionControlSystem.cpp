@@ -340,6 +340,7 @@ void MotionControlSystem::manageStop()
 		}
 	}
 
+//-----------//
 
 	if (isPhysicallyStopped() && moving && !curveMovement && !forcedMovement) // Pour un blocage classique
 	{
@@ -365,7 +366,7 @@ void MotionControlSystem::manageStop()
 			}
 		}
 	}
-	else if ((isLeftWheelSpeedAbnormal() || isRightWheelSpeedAbnormal()) && curveMovement) // Sert a vérifier que les consignes de vitesse sont bien respectées (blocage pour les trajectoires courbes)
+	else if ((isLeftWheelSpeedAbnormal() || isRightWheelSpeedAbnormal()) && curveMovement && !forcedMovement) // Sert a vérifier que les consignes de vitesse sont bien respectées (blocage pour les trajectoires courbes)
 	{
 		if (time2 == 0)
 				{ //Début du timer
