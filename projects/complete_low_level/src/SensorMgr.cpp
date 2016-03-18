@@ -174,7 +174,7 @@ SensorMgr::SensorMgr():
 	/* PA7 is connected to EXTI_Line7, which has EXTI9_5_IRQn vector */
 	NVIC_InitStruct.NVIC_IRQChannel = EXTI9_5_IRQn;
 	/* Set priority */
-	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x01;
+	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
 	/* Set sub priority */
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x01;
 	/* Enable interrupt */
@@ -209,7 +209,7 @@ SensorMgr::SensorMgr():
 
 	NVIC_InitStruct.NVIC_IRQChannel = EXTI4_IRQn;
 	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
-	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
+	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x02;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStruct);
 
@@ -239,7 +239,7 @@ SensorMgr::SensorMgr():
 
 	NVIC_InitStruct.NVIC_IRQChannel = EXTI9_5_IRQn;
 	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x02;
-	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x02;
+	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x03;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStruct);
 
