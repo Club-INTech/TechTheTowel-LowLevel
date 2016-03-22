@@ -127,9 +127,10 @@ int main(void)
 			else if(!strcmp("us",order))		//Indiquer la distance mesurée par les capteurs à ultrason
 			{
 				serial.printfln("%d", sensorMgr->getSensorDistanceAVG());//en mm
-				serial.printfln("%d", sensorMgr->getSensorDistanceAVD());//en mm
-				serial.printfln("%d", sensorMgr->getSensorDistanceARG());//en mm
-				serial.printfln("%d", sensorMgr->getSensorDistanceARD());//en mm
+				//serial.printfln("%d", sensorMgr->getSensorDistanceAVD());//en mm
+				serial.printfln("%d", sensorMgr->getSensorDistanceARG());//en mm // qui représente AVD en fait
+				serial.printfln("%d", sensorMgr->getSensorDistanceARD());//en mm // qui représente l'arrière.
+				serial.printfln("0"); // Pour que le haut niveau gueule pas en disant "OMG IL Y A QUE 3 REPONSES SUR 4 !" #Mongol
 			}
 			else if(!strcmp("j",order))			//Indiquer l'état du jumper (0='en place'; 1='dehors')
 			{
@@ -785,14 +786,17 @@ void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 void EXTI9_5_IRQHandler(void)
 {
 	static SensorMgr* sensorMgr = &SensorMgr::Instance(); // Capteurs US
-
+/*
 	//Interruptions de l'ultrason de test
     if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
         sensorMgr->sensorInterrupt(5);
 
-        /* Clear interrupt flag */
+        // Clear interrupt flag
         EXTI_ClearITPendingBit(EXTI_Line5);
+
     }
+*/
+
     if (EXTI_GetITStatus(EXTI_Line7) != RESET) {
         sensorMgr->sensorInterrupt(7);
 
@@ -859,7 +863,7 @@ void EXTI1_IRQHandler(void) // Gauche fermée
 
 
 
-void EXTI4_IRQHandler(void)
+void EXTI4_IRQHandler(void) // Capteur AVD (celui qui a foutu la merde, et qui est sensé être en PA5)
 {
 	static SensorMgr* sensorMgr = &SensorMgr::Instance();
 

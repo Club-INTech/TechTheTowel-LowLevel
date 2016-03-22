@@ -35,6 +35,9 @@ SensorMgr::SensorMgr():
 
 	GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
 
+// Desactive la clock de la SPII1 (l'accelerometre qui fout la merde sur PA5) :
+
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, DISABLE);
 
 
 /*         _________________________________________
@@ -92,17 +95,16 @@ SensorMgr::SensorMgr():
 
 
 	/*
-	 * Capteur US AVD : PA5
+	 * Capteur US AVD : PA5 ---- ATTENTION celle ci ne marche pas bien : inversion entre AVD et ARD ----
 	 */
-
-	/* Activation de l'horloge du port A et C */
+/*
+	// Activation de l'horloge du port A
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
-	/* Activation de l'horloge du SYSCFG */
+	// Activation de l'horloge du SYSCFG
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
-	/*Réglages de la pin*/
+	//Réglages de la pin
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
@@ -110,33 +112,34 @@ SensorMgr::SensorMgr():
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-	/* Tell system that you will use PA5 for EXTI_Line5 */
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource5);
+	// Tell system that you will use PA5 for EXTI_Line5
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource4);
 
-	/* PA6 is connected to EXTI_Line5 */
+	// PA5 is connected to EXTI_Line5
 	EXTI_InitStruct.EXTI_Line = EXTI_Line5;
-	/* Enable interrupt */
+	// Enable interrupt
 	EXTI_InitStruct.EXTI_LineCmd = DISABLE;
-	/* Interrupt mode */
+	// Interrupt mode
 	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-	/* Triggers on rising and falling edge */
+	// Triggers on rising and falling edge
 	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
-	/* Add to EXTI */
+	// Add to EXTI
 	EXTI_Init(&EXTI_InitStruct);
 
-	/* Add IRQ vector to NVIC */
-	/* PA6 is connected to EXTI_Line6, which has EXTI9_5_IRQn vector */
+	// Add IRQ vector to NVIC
+	// PA7 is connected to EXTI_Line5, which has EXTI9_5_IRQn vector
 	NVIC_InitStruct.NVIC_IRQChannel = EXTI9_5_IRQn;
-	/* Set priority */
+	// Set priority
 	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
-	/* Set sub priority */
-	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
-	/* Enable interrupt */
+	// Set sub priority
+	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x01;
+	// Enable interrupt
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-	/* Add to NVIC */
+	// Add to NVIC
 	NVIC_Init(&NVIC_InitStruct);
 
-	ultrasonAVD.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);//On donne les paramètres de la pin et de l'interruption au capteur pour qu'il puisse les modifier sans faire d'erreur
+	ultrasonAVD.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);
+*/
 
 	/*
 	 * Capteur US AVG : PA7
@@ -185,6 +188,7 @@ SensorMgr::SensorMgr():
 	ultrasonAVG.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);
 
 
+
 	  // Capteur US ARG :
 
 
@@ -209,11 +213,13 @@ SensorMgr::SensorMgr():
 
 	NVIC_InitStruct.NVIC_IRQChannel = EXTI4_IRQn;
 	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
-	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x02;
+	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x01;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStruct);
 
 	ultrasonARG.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);
+
+
 
 	 // Capteur US ARD :
 
@@ -238,8 +244,8 @@ SensorMgr::SensorMgr():
 	EXTI_Init(&EXTI_InitStruct);
 
 	NVIC_InitStruct.NVIC_IRQChannel = EXTI9_5_IRQn;
-	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x02;
-	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x03;
+	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
+	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x01;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStruct);
 
@@ -362,7 +368,7 @@ void SensorMgr::refresh()
 			ultrasonARD.refresh();
 		}
 
-		capteur = (capteur+1)%4;
+		capteur = (capteur+1)%4;  // On rafraichit les valeurs de chaque capteur un par un (un par appel de refresh)
 		lastRefreshTime = currentTime;
 	}
 }
@@ -378,7 +384,7 @@ void SensorMgr::sensorInterrupt(int pin){
 	else if(pin == 6)
 		ultrasonARD.interruption();
 	else if(pin == 5)
-		ultrasonAVD.interruption();
+		ultrasonAVG.interruption();
 	else if(pin == 7)
 		ultrasonAVG.interruption();
 }
