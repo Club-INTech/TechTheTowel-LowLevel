@@ -188,7 +188,15 @@ int main(void)
 				motionControlSystem->setRotationSpeed(speedRotation);
 			}
 
+			else if(!strcmp("ssa", order))
+			{
+				motionControlSystem->setSmoothAcceleration();
+			}
 
+			else if(!strcmp("sva", order))
+			{
+				motionControlSystem->setViolentAcceleration();
+			}
 
 			// POUR MONTLHERY
 
@@ -810,10 +818,30 @@ void EXTI9_5_IRQHandler(void)
            EXTI_ClearITPendingBit(EXTI_Line6);
        }
 
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
+    	while(42){
+    		}
+    		EXTI_ClearITPendingBit(EXTI_Line5);
+           }
+
+
+    if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
+    	while(42){
+    		}
+			   EXTI_ClearITPendingBit(EXTI_Line8);
+		   }
+
+    if (EXTI_GetITStatus(EXTI_Line9) != RESET) {
+    	while(42){
+    		}
+    		EXTI_ClearITPendingBit(EXTI_Line9);
+           }
+
 }
 
 void EXTI0_IRQHandler(void) // Capteur fin de course Droite ouverte
 {
+
 	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
 
 	if(!binaryMotorMgr->isRightDoorClosing()){ // Sécurité : N'arrete pas le moteur il est en train d'ouvrir (problème de front montant du capteur)
@@ -821,6 +849,7 @@ void EXTI0_IRQHandler(void) // Capteur fin de course Droite ouverte
 		binaryMotorMgr->setRightDoorOpening(false);
 	}
 	EXTI_ClearITPendingBit(EXTI_Line0);
+
 }
 
 void EXTI15_10_IRQHandler(void)
@@ -843,6 +872,29 @@ void EXTI15_10_IRQHandler(void)
 		}
 		EXTI_ClearITPendingBit(EXTI_Line15);
 	}
+
+	if (EXTI_GetITStatus(EXTI_Line10) != RESET) {
+		while(42){
+			}
+		EXTI_ClearITPendingBit(EXTI_Line10);
+	           }
+	if (EXTI_GetITStatus(EXTI_Line11) != RESET) {
+		while(42){
+			}
+		EXTI_ClearITPendingBit(EXTI_Line11);
+	           }
+	if (EXTI_GetITStatus(EXTI_Line12) != RESET) {
+		while(42){
+			}
+		EXTI_ClearITPendingBit(EXTI_Line12);
+	           }
+	if (EXTI_GetITStatus(EXTI_Line14) != RESET) {
+		while(42){
+			}
+		EXTI_ClearITPendingBit(EXTI_Line14);
+	           }
+
+
 }
 
 
@@ -874,6 +926,27 @@ void EXTI4_IRQHandler(void) // Capteur AVD (celui qui a foutu la merde, et qui e
 	        EXTI_ClearITPendingBit(EXTI_Line4);
 	    }
 }
+
+void EXTI2_IRQHandler(void)
+{
+	while(42){
+	}
+	EXTI_ClearITPendingBit(EXTI_Line2);
+}
+
+void EXTI3_IRQHandler(void)
+{
+	while(42){
+		}
+	EXTI_ClearITPendingBit(EXTI_Line3);
+}
+
+void HardFault_Handler(void)
+{
+	while(1);
+}
+
+
 
 /*
  *   Dead Pingu in the Main !

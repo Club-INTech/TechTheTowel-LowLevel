@@ -30,7 +30,7 @@
 #define TOLERANCY 50
 
 #if DEBUG
-#define TRACKER_SIZE 		1500
+#define TRACKER_SIZE 		1
 #else
 #define TRACKER_SIZE 		1
 #endif
@@ -171,6 +171,7 @@ private:
 
 	int delayToEstablish; // Temps à attendre avant de considérer la vitesse stable
 
+	float toleranceCurveRatio; // Tolérance en trajectoire courbe avant de bloquer si le rayon est mauvais
 	/*
 	 * Dispositif d'enregistrement de l'état du système pour permettre le débug
 	 * La valeur de TRACKER_SIZE dépend de la valeur de DEBUG.
@@ -224,6 +225,9 @@ public:
 
 	void enableForcedMovement();
 	void disableForcedMovement();
+
+	void setSmoothAcceleration();
+	void setViolentAcceleration();
 
 	void track();//Stock les valeurs de débug
 	void printTrackingAll();//Affiche l'intégralité du tableau de tracking

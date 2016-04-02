@@ -46,6 +46,7 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	toleranceSpeed = 50;
 	toleranceSpeedEstablished = 50; // Doit être la plus petite possible, sans bloquer les trajectoires courbes
 	delayToEstablish = 1000;
+	toleranceCurveRatio = 0.9;
 
 
 	translationPID.setTunings(13, 0, 0);
@@ -322,6 +323,13 @@ void MotionControlSystem::disableForcedMovement(){
 	forcedMovement=false;
 }
 
+void MotionControlSystem::setSmoothAcceleration(){
+	maxAcceleration = 5;
+}
+
+void MotionControlSystem::setViolentAcceleration(){
+	maxAcceleration = 15;
+}
 
 void MotionControlSystem::manageStop()
 {
@@ -366,6 +374,26 @@ void MotionControlSystem::manageStop()
 			}
 		}
 	}
+
+	else if(moving && !isSpeedEstablished && curveMovement && !forcedMovement){ // Vérifie que le ratio reste bon pdt les traj courbes
+			if (leftCurveRatio<rightCurveRatio && averageRightSpeed.value() !=0 && rightCurveRatio!=0){ // si on tourne a gauche
+				if (ABS((averageLeftSpeed.value()/averageRightSpeed.value())-(leftCurveRatio/rightCurveRatio))>toleranceCurveRatio){
+					int john1 = averageLeftSpeed.value();
+					int john2 = averageRightSpeed.value();
+					stop();
+					moveAbnormal = true;
+				}
+				else if(rightCurveRatio<leftCurveRatio && averageLeftSpeed.value()!=0 && leftCurveRatio!=0){ //si on tourne à droite
+					if (ABS((averageRightSpeed.value()/averageLeftSpeed.value())-(rightCurveRatio/leftCurveRatio))>toleranceCurveRatio){
+						int john1 = averageLeftSpeed.value();
+						int john2 = averageRightSpeed.value();
+						stop();
+						moveAbnormal = true;
+					}
+				}
+			}
+		}
+
 	else if ((isLeftWheelSpeedAbnormal() || isRightWheelSpeedAbnormal()) && curveMovement && !forcedMovement) // Sert a vérifier que les consignes de vitesse sont bien respectées (blocage pour les trajectoires courbes)
 	{
 		if (time2 == 0)
@@ -407,6 +435,8 @@ void MotionControlSystem::manageStop()
 						}
 				}
 		}
+
+
 
 	else
 	{

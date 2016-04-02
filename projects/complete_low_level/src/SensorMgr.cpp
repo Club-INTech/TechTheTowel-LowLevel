@@ -37,7 +37,7 @@ SensorMgr::SensorMgr():
 
 // Desactive la clock de la SPII1 (l'accelerometre qui fout la merde sur PA5) :
 
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, DISABLE);
+//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, DISABLE);
 
 
 /*         _________________________________________
@@ -430,7 +430,7 @@ int SensorMgr::getSensorDistanceARD() {
 
 
 bool SensorMgr::isJumperOut() const{
-	return !GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_9);
+	return GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_14);
 }
 
 bool SensorMgr::isLeftDoorOpen() {
