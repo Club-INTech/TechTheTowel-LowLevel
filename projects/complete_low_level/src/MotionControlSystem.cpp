@@ -418,19 +418,20 @@ void MotionControlSystem::manageStop()
 				}
 	}
 
-	else if (forcedMovement){
+	else if (forcedMovement && moving){
 
 		if (time3 == 0)
 				{
 					time3 = Millis();
 				}
-				else
+			else
 				{
 					if ((Millis() - time3) >= delayToStop){
 						if (ABS(translationPID.getError()) <= toleranceTranslation && ABS(rotationPID.getError()) <= toleranceRotation)
-										{ //Stopé pour cause de fin de mouvement
+										{ //Stoppé pour cause de fin de mouvement
 											stop();
 											moveAbnormal = false;
+
 										}
 						}
 				}
@@ -442,6 +443,7 @@ void MotionControlSystem::manageStop()
 	{
 		time = 0;
 		time2 =0;
+		time3 = 0; // Test
 		if(moving)
 			moveAbnormal = false;
 	}
