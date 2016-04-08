@@ -152,6 +152,15 @@ int main(void)
 			{
 				motionControlSystem->enableRotationControl(true);
 			}
+			else if(!strcmp("cv0",order))		//Activer l'asservissement en rotation
+			{
+				motionControlSystem->enableSpeedControl(false);
+			}
+			else if(!strcmp("cv1",order))		//Activer l'asservissement en rotation
+			{
+				motionControlSystem->enableSpeedControl(true);
+			}
+
 			else if(!strcmp("cx",order))		//Régler la composante x de la position (en mm)
 			{
 				float x;
@@ -310,7 +319,7 @@ int main(void)
 				motionControlSystem->testRotation();
 			}
 
-			else if(!strcmp("av", order))
+			else if(!strcmp("av", order)) // desactive asserv vitesse
 			{
 				static bool asservVitesse = false;
 				motionControlSystem->enableSpeedControl(asservVitesse);

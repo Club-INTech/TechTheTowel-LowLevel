@@ -30,7 +30,7 @@
 #define TOLERANCY 50
 
 #if DEBUG
-#define TRACKER_SIZE 		1
+#define TRACKER_SIZE 		1500
 #else
 #define TRACKER_SIZE 		1
 #endif
