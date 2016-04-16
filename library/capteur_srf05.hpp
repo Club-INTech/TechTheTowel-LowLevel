@@ -62,6 +62,8 @@ public:
 
 	void refresh()
 	{
+		/*EXTI_sensor.EXTI_LineCmd = DISABLE;
+		EXTI_Init(&EXTI_sensor);*/
 			// On met la pin en output
 		GPIO_sensor.GPIO_Mode = GPIO_Mode_OUT;
 		GPIO_Init(GPIOx, &GPIO_sensor);
@@ -113,6 +115,12 @@ public:
 			GPIO_sensor.GPIO_Mode = GPIO_Mode_OUT;
 			GPIO_Init(GPIOx, &GPIO_sensor);
 		}
+	}
+
+	void stopInterrupt()
+	{
+		EXTI_sensor.EXTI_LineCmd = DISABLE;
+		EXTI_Init(&EXTI_sensor);
 	}
 
 private:

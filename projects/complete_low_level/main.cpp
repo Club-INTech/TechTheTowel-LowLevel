@@ -127,10 +127,10 @@ int main(void)
 			else if(!strcmp("us",order))		//Indiquer la distance mesurée par les capteurs à ultrason
 			{
 				serial.printfln("%d", sensorMgr->getSensorDistanceAVG());//en mm
-				//serial.printfln("%d", sensorMgr->getSensorDistanceAVD());//en mm
+				serial.printfln("%d", sensorMgr->getSensorDistanceAVD());//en mm
 				serial.printfln("%d", sensorMgr->getSensorDistanceARG());//en mm // qui représente AVD en fait
 				serial.printfln("%d", sensorMgr->getSensorDistanceARD());//en mm // qui représente l'arrière.
-				serial.printfln("0"); // Pour que le haut niveau gueule pas en disant "OMG IL Y A QUE 3 REPONSES SUR 4 !" #Mongol
+				//serial.printfln("0"); // Pour que le haut niveau gueule pas en disant "OMG IL Y A QUE 3 REPONSES SUR 4 !" #Mongol
 			}
 			else if(!strcmp("j",order))			//Indiquer l'état du jumper (0='en place'; 1='dehors')
 			{
@@ -815,24 +815,29 @@ void EXTI9_5_IRQHandler(void)
 */
 
     if (EXTI_GetITStatus(EXTI_Line7) != RESET) {
-        sensorMgr->sensorInterrupt(7);
+        sensorMgr->AVGInterrupt();
+        //serial.printfln("7");
+
 
         /* Clear interrupt flag */
         EXTI_ClearITPendingBit(EXTI_Line7);
     }
     if (EXTI_GetITStatus(EXTI_Line6) != RESET) {
-           sensorMgr->sensorInterrupt(6);
+           sensorMgr->ARDInterrupt();
+           //serial.printfln("6");
 
            /* Clear interrupt flag */
            EXTI_ClearITPendingBit(EXTI_Line6);
        }
 
     if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
-    	while(42){
-    		}
-    		EXTI_ClearITPendingBit(EXTI_Line5);
-           }
+    	sensorMgr->AVDInterrupt();
+        //serial.printfln("5");
 
+
+    	/* Clear interrupt flag */
+    	EXTI_ClearITPendingBit(EXTI_Line5);
+    }
 
     if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
     	while(42){
@@ -929,7 +934,8 @@ void EXTI4_IRQHandler(void) // Capteur AVD (celui qui a foutu la merde, et qui e
 	static SensorMgr* sensorMgr = &SensorMgr::Instance();
 
 	if (EXTI_GetITStatus(EXTI_Line4) != RESET) {
-	        sensorMgr->sensorInterrupt(4);
+	        sensorMgr->ARGInterrupt();
+	          // serial.printfln("4");
 	       // serial.printfln("interrupt 4");
 	        // Clear interrupt flag
 	        EXTI_ClearITPendingBit(EXTI_Line4);

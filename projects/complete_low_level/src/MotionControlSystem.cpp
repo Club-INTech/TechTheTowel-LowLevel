@@ -291,13 +291,15 @@ void MotionControlSystem::control()
 
 	if(leftSpeedControlled)
 		leftSpeedPID.compute();		// Actualise la valeur de 'leftPWM'
+	else
+		leftPWM = 0;
 	if(rightSpeedControlled)
 		rightSpeedPID.compute();	// Actualise la valeur de 'rightPWM'
-
+	else
+		rightPWM = 0;
 
 	leftMotor.run(leftPWM);
 	rightMotor.run(rightPWM);
-
 
 }
 
