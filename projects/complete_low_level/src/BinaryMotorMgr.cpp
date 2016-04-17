@@ -8,8 +8,10 @@
 #include "BinaryMotorMgr.hpp"
 
 
-bool rightDoorOpen = false;
-bool leftDoorOpen = false;
+bool rightDoorOpening = false;
+bool leftDoorOpening = false;
+bool rightDoorClosing = false;
+bool leftDoorClosing = false;
 
 BinaryMotorMgr::BinaryMotorMgr() {
 
@@ -149,18 +151,29 @@ void BinaryMotorMgr::stopRightDoor() {
 
 /*--- Etat des portes ---*/
 
-bool BinaryMotorMgr::isRightDoorOpen() {
-		return rightDoorOpen;
+
+void BinaryMotorMgr::setRightDoorOpening(bool value){
+	rightDoorOpening = value;
+}
+void BinaryMotorMgr::setLeftDoorOpening(bool value){
+	leftDoorOpening = value;
+}
+void BinaryMotorMgr::setRightDoorClosing(bool value){
+	rightDoorClosing = value;
+}
+void BinaryMotorMgr::setLeftDoorClosing(bool value){
+	leftDoorClosing = value;
 }
 
-bool BinaryMotorMgr::isLeftDoorOpen() {
-		return leftDoorOpen;
+bool BinaryMotorMgr::isRightDoorOpening(){
+	return rightDoorOpening;
 }
-
-void BinaryMotorMgr::setRightDoorOpen(bool value) {
-	rightDoorOpen = value;
+bool BinaryMotorMgr::isLeftDoorOpening(){
+	return leftDoorOpening;
 }
-
-void BinaryMotorMgr::setLeftDoorOpen(bool value) {
-	leftDoorOpen = value;
+bool BinaryMotorMgr::isRightDoorClosing(){
+	return rightDoorClosing;
+}
+bool BinaryMotorMgr::isLeftDoorClosing(){
+	return leftDoorClosing;
 }

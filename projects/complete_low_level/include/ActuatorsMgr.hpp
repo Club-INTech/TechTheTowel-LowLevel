@@ -23,7 +23,7 @@ extern Uart<1> serial;
 
 // on définit les différents angles utilisés pour le coté gauche et le coté droit
 
-#define fishingRightPosition 155
+#define fishingRightPosition 152
 #define initialRightPosition 230
 #define middleRightPosition 200
 #define fingerRightInitialPosition 150
@@ -32,7 +32,7 @@ extern Uart<1> serial;
 
 
 // Coté gauche
-#define fishingLeftPosition 145 //valeur peu êter un peu élevé
+#define fishingLeftPosition 148 //valeur peu êter un peu élevé
 #define initialLeftPosition 70
 #define middleLeftPosition 100
 #define fingerLeftInitialPosition 50

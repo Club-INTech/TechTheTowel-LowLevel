@@ -111,8 +111,6 @@ tor		Turn Only Right		Rotation absolue. Permet de ne tourner qu'à droite, pour n
 
 tol		Turn Only Left		Rotation absolue. Permet de ne tourner qu'à gauche, pour ne pas perdre le sable.
 
-dc		Déplacement courbe	Permer d'ordonner un déplacement courbe. A donner dans l'ordre : Longueur d'arc et rayon de courbure
-					Tourne en sens trigo si le rayon de courbure est positif. Anti-trigo si négatif.
 
 t3		Ordonne une rotation relative.
 		La ligne suivante doit être un FLOTANT correspondant à l'angle de rotation voulu, en radians.
@@ -123,6 +121,8 @@ ct0		Désactive l'asservissement en translation. Effet : pwmTranslation = 0 quell
 ct1		Active l'asservissement en translation.
 cr0		Désactive l'asservissement en rotation. Effet : pwmRotation = 0 quelle que soit la consigne en rotation. 
 cr1		Active l'asservissement en rotation.
+cv0		Désactive l'asserv en vitesse
+cv1		Active l'asserv en vitesse
 
 Commandes de réglage de la position
 Ces commandes n'ont aucun effet sur l'asservissement en position/vitesse.
@@ -203,3 +203,8 @@ Pour les axes rotatifs :
 Avant le début du match :
 
 	aif	AX12 initial fishes		Asservir tous les AX12 en position initiale
+
+
+
+
+Que celui qui a remarqué cette ligne vienne me faire signe svp. Rémi.
