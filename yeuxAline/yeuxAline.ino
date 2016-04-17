@@ -44,7 +44,7 @@ FLIP_ORDER permet d'actualiser l'affichage
 //Transforme un numéro de colonne (de 0 à NB_COLONNE - 1) en pin de l'arduino
 uint8_t pinColonne(uint8_t nb)
 {
-	static uint8_t correspondance[NB_COLONNES] = { 9,10,11,12,13,14,15,16,18,17 };
+	static uint8_t correspondance[NB_COLONNES] = { 9,10,12,11,13,14,15,16,17,19,18 };
 	return correspondance[nb];
 }
 
@@ -170,7 +170,7 @@ void loop()
 // Lecture du buffer de réception série. Met à jour la partie 'écriture' du tableau 'data'.
 void serialEvent()
 {
-	static uint8_t indice = 0, ligne, colonne, luminosite = 50;
+	static uint8_t indice = 0, ligne, colonne, luminosite = 25;
 	static int byte;
 	static bool lectureTrameEnCours = false;
 
@@ -191,7 +191,7 @@ void serialEvent()
 	}
 	else if (lectureTrameEnCours)
 	{
-		if (indice == 78)	// Lecture du dernier octet de la trame, correspondant à la luminosité.
+		if (indice == 77)	// Lecture du dernier octet de la trame, correspondant à la luminosité.
 		{
 			luminosite = byte;
 			lectureTrameEnCours = false;	// On a terminé la lecture de la trame
