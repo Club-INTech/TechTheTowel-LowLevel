@@ -13,6 +13,7 @@
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_rcc.h"
 #include "Singleton.hpp"
+#include "delay.h"
 
 
 
@@ -43,6 +44,10 @@ public:
 	bool isLeftDoorOpening();
 	bool isRightDoorClosing();
 	bool isLeftDoorClosing();
+
+	void manageBlockedDoor();
+	bool isRightDoorBlocked();
+	bool isLeftDoorBlocked();
 };
 
 #endif
