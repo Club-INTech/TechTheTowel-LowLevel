@@ -15,10 +15,10 @@
  * Permet de mesurer la tension de la LiPO et l'affiche sur un indicateur à 10 LEDs
  * @author discord & sa maman
  */
-class voltage_controller : public Singleton<voltage_controller>
+class Voltage_controller : public Singleton<Voltage_controller>
 {
 public:
-	voltage_controller()
+	Voltage_controller()
 	{
 		counter = 0;
 		blink = false;

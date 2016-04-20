@@ -12,7 +12,7 @@
 #include "Counter.h"
 #include <Uart.hpp>
 #include "average.hpp"
-#include "utils.h"
+#include <utils.h>
 
 #define PI 3.14159265
 

@@ -6,12 +6,19 @@
  */
 
 #include "BinaryMotorMgr.hpp"
+#include "SensorMgr.h"
 
 
 bool rightDoorOpening = false;
 bool leftDoorOpening = false;
 bool rightDoorClosing = false;
 bool leftDoorClosing = false;
+
+bool RightDoorBlocked = false;
+bool LeftDoorBlocked = false;
+
+uint32_t timeToStopDoor = 300;
+uint32_t timeTooLong = 6000;
 
 BinaryMotorMgr::BinaryMotorMgr() {
 
@@ -153,15 +160,19 @@ void BinaryMotorMgr::stopRightDoor() {
 
 
 void BinaryMotorMgr::setRightDoorOpening(bool value){
+	RightDoorBlocked = false;
 	rightDoorOpening = value;
 }
 void BinaryMotorMgr::setLeftDoorOpening(bool value){
+	LeftDoorBlocked = false;
 	leftDoorOpening = value;
 }
 void BinaryMotorMgr::setRightDoorClosing(bool value){
+	RightDoorBlocked = false;
 	rightDoorClosing = value;
 }
 void BinaryMotorMgr::setLeftDoorClosing(bool value){
+	LeftDoorBlocked = false;
 	leftDoorClosing = value;
 }
 
@@ -176,4 +187,56 @@ bool BinaryMotorMgr::isRightDoorClosing(){
 }
 bool BinaryMotorMgr::isLeftDoorClosing(){
 	return leftDoorClosing;
+}
+
+
+/*---Gestion des blocages--*/
+
+void BinaryMotorMgr::manageBlockedDoor(){
+	SensorMgr* sensorMgr = &SensorMgr::Instance();
+	static uint32_t rightTimer = 0;
+	static uint32_t leftTimer = 0;
+
+	if(!rightDoorClosing && rightTimer!=0)
+		rightTimer = 0;
+	if(!leftDoorClosing && leftTimer!=0)
+		leftTimer = 0;
+
+	if(rightDoorClosing){
+		if(rightTimer == 0)
+			rightTimer = Millis();
+		else if(Millis() - rightTimer >= timeToStopDoor && sensorMgr->isRightDoorOpen()){ // && porte ouverte
+			stopRightDoor();
+			RightDoorBlocked = true;
+			rightDoorClosing = false;
+		}
+		else if(Millis() - rightTimer >= timeTooLong){
+			stopRightDoor();
+			RightDoorBlocked = true;
+			rightDoorClosing = false;
+
+		}
+	}
+	if(leftDoorClosing){
+		if(leftTimer == 0)
+			leftTimer = Millis();
+		else if(Millis() - leftTimer >= timeToStopDoor && sensorMgr->isLeftDoorOpen()){
+			stopLeftDoor();
+			LeftDoorBlocked = true;
+			leftDoorOpening = false;
+		}
+		else if(Millis() - leftTimer >= timeTooLong){
+			stopLeftDoor();
+			LeftDoorBlocked = true;
+			leftDoorOpening = false;
+		}
+	}
+}
+
+bool BinaryMotorMgr::isRightDoorBlocked(){
+	return RightDoorBlocked;
+}
+
+bool BinaryMotorMgr::isLeftDoorBlocked(){
+	return LeftDoorBlocked;
 }
