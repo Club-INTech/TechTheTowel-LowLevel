@@ -108,7 +108,7 @@ SensorMgr::SensorMgr():
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
-		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 		GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -143,7 +143,7 @@ SensorMgr::SensorMgr():
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -190,7 +190,7 @@ SensorMgr::SensorMgr():
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_7;
-		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 		GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -234,7 +234,7 @@ SensorMgr::SensorMgr():
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -471,7 +471,7 @@ int SensorMgr::getSensorDistanceARD() {
 
 
 bool SensorMgr::isJumperOut() const{
-	return GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_14);
+	return !GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_14);
 }
 
 bool SensorMgr::isLeftDoorOpen() {

@@ -138,11 +138,11 @@ public:
 		}
 		if(ADCValue >= voltage_echelon*3 + minimal_voltage )
 		{
-			GPIO_SetBits(GPIOA, GPIO_Pin_13);
+			GPIO_SetBits(GPIOA, GPIO_Pin_10);
 		}
 		if(ADCValue >= voltage_echelon*2 + minimal_voltage )
 		{
-			GPIO_SetBits(GPIOA, GPIO_Pin_9);
+			GPIO_SetBits(GPIOC, GPIO_Pin_8);
 		}
 		if(ADCValue >= voltage_echelon + minimal_voltage )
 		{
@@ -218,8 +218,8 @@ private:
 		GPIO_ResetBits(GPIOD, GPIO_Pin_0);
 		GPIO_ResetBits(GPIOC, GPIO_Pin_11);
 		GPIO_ResetBits(GPIOA, GPIO_Pin_15);
-		GPIO_ResetBits(GPIOA, GPIO_Pin_13);
-		GPIO_ResetBits(GPIOA, GPIO_Pin_9);
+		GPIO_ResetBits(GPIOA, GPIO_Pin_10);
+		GPIO_ResetBits(GPIOC, GPIO_Pin_8);
 		GPIO_ResetBits(GPIOC, GPIO_Pin_9);
 		GPIO_ResetBits(GPIOC, GPIO_Pin_7);
 	}

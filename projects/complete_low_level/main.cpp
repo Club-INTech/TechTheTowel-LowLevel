@@ -21,7 +21,7 @@ int main(void)
 	ActuatorsMgr* actuatorsMgr = &ActuatorsMgr::Instance();
 	SensorMgr* sensorMgr = &SensorMgr::Instance();
 	BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
-	Voltage_controller* voltage = &Voltage_controller::Instance();
+	//Voltage_controller* voltage = &Voltage_controller::Instance();
 
 	char order[64];//Permet le stockage du message reçu par la liaison série
 
