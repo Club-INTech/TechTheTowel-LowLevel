@@ -22,7 +22,7 @@ SensorMgr::SensorMgr():
 	ultrasonARD()
 {
 	lastRefreshTime = 0;
-	refreshDelay = 40;//(ms)
+	refreshDelay = 30;//(ms)
 
 	/* Set variables used */
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -108,7 +108,7 @@ SensorMgr::SensorMgr():
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
-		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 		GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -122,7 +122,7 @@ SensorMgr::SensorMgr():
 
 		NVIC_InitStruct.NVIC_IRQChannel = EXTI9_5_IRQn;
 		NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
-		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x03;
+		NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
 		NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 		NVIC_Init(&NVIC_InitStruct);
 
@@ -143,7 +143,7 @@ SensorMgr::SensorMgr():
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -167,7 +167,7 @@ SensorMgr::SensorMgr():
 	// Set priority
 	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
 	// Set sub priority
-	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
+	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x01;
 	// Enable interrupt
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	// Add to NVIC
@@ -190,7 +190,7 @@ SensorMgr::SensorMgr():
 		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 		GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_7;
-		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+		GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 		GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -220,6 +220,7 @@ SensorMgr::SensorMgr():
 		/* Add to NVIC */
 		NVIC_Init(&NVIC_InitStruct);
 
+
 	ultrasonAVG.init(GPIOA, GPIO_InitStruct, EXTI_InitStruct);
 
 
@@ -234,7 +235,7 @@ SensorMgr::SensorMgr():
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 

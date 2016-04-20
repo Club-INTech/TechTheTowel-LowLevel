@@ -815,7 +815,7 @@ void EXTI9_5_IRQHandler(void)
 */
 
     if (EXTI_GetITStatus(EXTI_Line7) != RESET) {
-        sensorMgr->AVGInterrupt();
+    	sensorMgr->AVGInterrupt();
         //serial.printfln("7");
 
 
@@ -944,9 +944,7 @@ void EXTI4_IRQHandler(void) // Capteur AVD (celui qui a foutu la merde, et qui e
 
 void EXTI2_IRQHandler(void)
 {
-	while(42){
-	}
-	EXTI_ClearITPendingBit(EXTI_Line2);
+
 }
 
 void EXTI3_IRQHandler(void)
