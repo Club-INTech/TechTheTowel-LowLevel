@@ -472,7 +472,7 @@ int SensorMgr::getSensorDistanceARD() {
 
 
 bool SensorMgr::isJumperOut() const{
-	return GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_14);
+	return !GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_14);
 }
 
 bool SensorMgr::isLeftDoorOpen() {
