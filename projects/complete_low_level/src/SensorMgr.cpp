@@ -22,7 +22,7 @@ SensorMgr::SensorMgr():
 	ultrasonARD()
 {
 	lastRefreshTime = 0;
-	refreshDelay = 30;//(ms)
+	refreshDelay = 15;//(ms)
 
 	/* Set variables used */
 	GPIO_InitTypeDef GPIO_InitStruct;
