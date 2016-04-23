@@ -10,18 +10,19 @@ void setup() {
   pinMode(7, OUTPUT);
   pinMode(8, INPUT);
   pinMode(4, OUTPUT);
-  pinMode(6, INPUT);
+  pinMode(3, INPUT);
   digitalWrite(7, LOW);
  
 }
 
 void loop() {
    if(digitalRead(8) && !done) { // On attend que le jumper soit mis en place (utile pour déterminer un front descendant, duh...)
+      digitalWrite(4, HIGH); // On indique qu'il a compris que le match commence
      while(digitalRead(8)) {
        // break;   <--- Utile pour tests sans jumper
      } // On attends le front descendant (enlevage du jumper)
 
-     digitalWrite(4, HIGH); // On indique qu'il a compris que le match commence
+     
      t_depart = millis();
      delay(91000);  // Oui, c'est dégeulasse.
      
@@ -29,7 +30,7 @@ void loop() {
       digitalWrite(7, HIGH);
       while(42)
       {
-        if(digitalRead(6))
+        if(digitalRead(3)) 
         {
           digitalWrite(7, LOW);
           break;

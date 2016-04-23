@@ -6,7 +6,7 @@
 #include "ring_buffer.hpp"
 #include "Uart.hpp"
 
-#define NB_VALEURS_MEDIANE_SRF  5
+#define NB_VALEURS_MEDIANE_SRF  3
 
 typedef ring_buffer<uint32_t, NB_VALEURS_MEDIANE_SRF> ringBufferSRF;
 extern Uart<1> serial;
@@ -44,6 +44,8 @@ public:
 	{
 		derniereDistance = 0;
 		origineTimer = 0;
+		risingEdgeTrigger = true;
+
 	}
 
 	void init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef GPIO_sensor, EXTI_InitTypeDef EXTI_sensor)
@@ -62,8 +64,8 @@ public:
 
 	void refresh()
 	{
-		/*EXTI_sensor.EXTI_LineCmd = DISABLE;
-		EXTI_Init(&EXTI_sensor);*/
+		EXTI_sensor.EXTI_LineCmd = DISABLE;
+		EXTI_Init(&EXTI_sensor);
 			// On met la pin en output
 		GPIO_sensor.GPIO_Mode = GPIO_Mode_OUT;
 		GPIO_Init(GPIOx, &GPIO_sensor);
@@ -75,8 +77,9 @@ public:
 			// On met un "un" sur la pin pour 10 µs
 		GPIO_SetBits(GPIOx, GPIO_sensor.GPIO_Pin);
 		Delay_us(10);
-
 		GPIO_ResetBits(GPIOx, GPIO_sensor.GPIO_Pin);
+
+		risingEdgeTrigger = true;
 
 			// Le signal a été envoyé, maintenant on attend la réponse dans l'interruption
 		GPIO_sensor.GPIO_Mode = GPIO_Mode_IN;
@@ -92,7 +95,6 @@ public:
 	 */
 	void interruption()
 	{
-		static bool risingEdgeTrigger = true;
 
 		if(risingEdgeTrigger)
 		{
@@ -130,6 +132,7 @@ private:
 	ringBufferSRF ringBufferValeurs;
 	volatile uint32_t derniereDistance;		//contient la dernière distance acquise, prête à être envoyée
 	volatile uint32_t origineTimer;			//origine de temps afin de mesurer une durée
+	bool risingEdgeTrigger;
 };
 
 #endif
