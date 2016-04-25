@@ -1,61 +1,69 @@
 // Ouverture du parasol (robot secondaire)
-// Transistor Moteur PIN 7 ; jumper relié au PIN 8 ; led de "match en cours" pin 4 ; capteur de contact pin 6
+// Transistor Moteur PIN 7 ; jumper relié au PIN 8 ; led de "match en cours" pin 4 ; capteur de contact fin de course pin 3
 // Moteur alimenté avec pile 9V et transistor polarisé amplificateur
 
 bool done = false;
 long int t_depart = 0;
 
+#define PIN_LED     4
+#define PIN_MOTOR   7
+#define PIN_JUMPER  8
+#define PIN_ENDSTOP 3
+
+#define MATCH_DURATION 91000
 
 void setup() {
-  pinMode(7, OUTPUT);
-  pinMode(8, INPUT);
-  pinMode(4, OUTPUT);
-  pinMode(3, INPUT);
-  digitalWrite(7, LOW);
-  
- 
+  pinMode(PIN_MOTOR, OUTPUT);
+  pinMode(PIN_JUMPER, INPUT);
+  pinMode(PIN_LED, OUTPUT);
+  pinMode(PIN_ENDSTOP, INPUT);
+   
 }
 
+void blinkLedMotherFucker(unsigned long delayOn, unsigned long delayOff){
+  static unsigned long lastToggleTime = 0;
+  static bool isOn = false;
+
+  if(isOn && millis() - lastToggleTime >= delayOn && delayOff != 0){
+    isOn = false;
+    lastToggleTime = millis();
+    digitalWrite(PIN_LED, LOW);
+  }
+
+  if(!isOn && millis() - lastToggleTime >= delayOff && delayOn != 0){
+    isOn = true;
+    lastToggleTime = millis();
+    digitalWrite(PIN_LED, HIGH);
+  }
+}
+
+
+
+
 void loop() {
-  bool blink = false;
-  
-   if(digitalRead(8) && !done) { // On attend que le jumper soit mis en place (utile pour déterminer un front descendant, duh...)
-      digitalWrite(4, HIGH); // On indique qu'il a compris que le match commence
-     while(digitalRead(8)) {
-       // break;   <--- Utile pour tests sans jumper
-     } // On attends le front descendant (enlevage du jumper)
 
-     
-     t_depart = millis();
-     
-     for(int i=0; i<=84; i++){ // 85 secondes
-     
-      delay(1000);  // Oui, c'est dégeulasse.
-      blink = !blink;
-      digitalWrite(4, blink);
-     }
+  while(!digitalRead(PIN_JUMPER)){
+    blinkLedMotherFucker(100, 100);
+  }
 
-     for(int i=0; i<=19; i++){ // 5 dernières secondes
-      delay(250);
-      blink = !blink;
-      digitalWrite(4, blink);
-     }
-     
-     
-     if((millis() - t_depart) <= 95000 && (millis() - t_depart) >= 90000) { // Empêche le lancement du moteur si le temps est écoulé ou s'il est trop tôt (overkill mais on ne l'est jamais trop quand il s'agit de ne pas se prendre une pénalité de 20 points)
-      digitalWrite(7, HIGH);
-      while(42)
-      {
-        if(digitalRead(3)) 
-        {
-          digitalWrite(7, LOW);
-          break;
-        }
-      }
-     }
+  while(digitalRead(PIN_JUMPER)){
+      blinkLedMotherFucker(500, 500);
+  }
 
-     digitalWrite(4, LOW);
-     done=true; // Empeche le système de se relancer
-   }
-  
+  unsigned long beginMatchTime = millis();
+
+  while(millis()-beginMatchTime <= MATCH_DURATION){
+    blinkLedMotherFucker(200, 600);
+  }
+
+  digitalWrite(PIN_MOTOR, HIGH);
+
+  while(!digitalRead(PIN_ENDSTOP));
+
+  digitalWrite(PIN_MOTOR, LOW);
+
+  while(true){
+    blinkLedMotherFucker(1,0);
+  }
+
 }
