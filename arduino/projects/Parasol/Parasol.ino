@@ -12,10 +12,13 @@ void setup() {
   pinMode(4, OUTPUT);
   pinMode(3, INPUT);
   digitalWrite(7, LOW);
+  
  
 }
 
 void loop() {
+  bool blink = false;
+  
    if(digitalRead(8) && !done) { // On attend que le jumper soit mis en place (utile pour déterminer un front descendant, duh...)
       digitalWrite(4, HIGH); // On indique qu'il a compris que le match commence
      while(digitalRead(8)) {
@@ -24,7 +27,20 @@ void loop() {
 
      
      t_depart = millis();
-     delay(91000);  // Oui, c'est dégeulasse.
+     
+     for(int i=0; i<=84; i++){ // 85 secondes
+     
+      delay(1000);  // Oui, c'est dégeulasse.
+      blink = !blink;
+      digitalWrite(4, blink);
+     }
+
+     for(int i=0; i<=19; i++){ // 5 dernières secondes
+      delay(250);
+      blink = !blink;
+      digitalWrite(4, blink);
+     }
+     
      
      if((millis() - t_depart) <= 95000 && (millis() - t_depart) >= 90000) { // Empêche le lancement du moteur si le temps est écoulé ou s'il est trop tôt (overkill mais on ne l'est jamais trop quand il s'agit de ne pas se prendre une pénalité de 20 points)
       digitalWrite(7, HIGH);

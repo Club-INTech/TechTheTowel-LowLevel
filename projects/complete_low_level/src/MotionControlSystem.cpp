@@ -592,6 +592,8 @@ void MotionControlSystem::stop() {
 	rotationPID.resetErrors();
 	leftSpeedPID.resetErrors();
 	rightSpeedPID.resetErrors();
+
+	direction = NONE;
 }
 
 

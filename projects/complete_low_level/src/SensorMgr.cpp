@@ -349,7 +349,7 @@ SensorMgr::SensorMgr():
 /*
  * Fonction de mise à jour des capteurs à ultrason
  */
-void SensorMgr::refresh()
+void SensorMgr::refresh(MOVING_DIRECTION direction)
 {
 	currentTime = Millis();
 	static uint8_t capteur = 0;
@@ -360,23 +360,40 @@ void SensorMgr::refresh()
 		ultrasonAVD.stopInterrupt();
 		ultrasonAVG.stopInterrupt();
 		ultrasonARG.stopInterrupt();*/
-		if(capteur == 0)
-		{
-			ultrasonAVG.refresh();
-		}
-		if(capteur == 1)
-		{
-			ultrasonAVD.refresh();
-		}
-		if (capteur == 2)
-		{
-			ultrasonARG.refresh();
-		}
-		if (capteur == 3)
-		{
-			ultrasonARD.refresh();
-		}
 
+		if (direction == NONE){
+			if(capteur == 0)
+			{
+				ultrasonAVG.refresh();
+			}
+			if(capteur == 1)
+			{
+				ultrasonAVD.refresh();
+			}
+			if (capteur == 2)
+			{
+				ultrasonARG.refresh();
+			}
+			if (capteur == 3)
+			{
+				ultrasonARD.refresh();
+			}
+		}
+		else if(direction == FORWARD){
+			if((capteur == 0) | (capteur == 2))
+				ultrasonAVG.refresh();
+
+			if((capteur == 1) | (capteur == 3))
+				ultrasonAVD.refresh();
+		}
+		else if(direction == BACKWARD){
+			if((capteur == 0) | (capteur == 2))
+				ultrasonARG.refresh();
+
+			if((capteur == 1) | (capteur == 3))
+				ultrasonARD.refresh();
+
+		}
 		capteur = (capteur+1)%4;  // On rafraichit les valeurs de chaque capteur un par un (un par appel de refresh)
 		lastRefreshTime = currentTime;
 	}

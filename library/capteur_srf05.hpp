@@ -6,7 +6,7 @@
 #include "ring_buffer.hpp"
 #include "Uart.hpp"
 
-#define NB_VALEURS_MEDIANE_SRF  3
+#define NB_VALEURS_MEDIANE_SRF  5
 
 typedef ring_buffer<uint32_t, NB_VALEURS_MEDIANE_SRF> ringBufferSRF;
 extern Uart<1> serial;
