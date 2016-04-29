@@ -533,14 +533,14 @@ void MotionControlSystem::orderRotation(float angleConsigneRadian, RotationWay r
 void MotionControlSystem::orderCurveTrajectory(float arcLength, float curveRadius)
 {
 	previousCurveRadius = curveRadius;
-	float radiusDiff = WHEEL_DISTANCE_TO_CENTER;
 	float finalAngle = (arcLength / ABS(curveRadius)) + getAngleRadian();
+	float signe = 1.0;
 
 	if(curveRadius < 0 ) // Si le rayon de courbure est négatif, on tourne dans l'autre sens
-		radiusDiff = (-1)*radiusDiff;
+		signe = -1.0;
 
-	leftCurveRatio = (ABS(curveRadius)-radiusDiff)/ABS(curveRadius);
-	rightCurveRatio = (ABS(curveRadius)+radiusDiff)/ABS(curveRadius);
+	leftCurveRatio = (ABS(curveRadius)-(RAYON_COD_GAUCHE*signe))/(ABS(curveRadius)+RAYON_COD_DROITE-RAYON_COD_GAUCHE);
+	rightCurveRatio = (ABS(curveRadius)+(RAYON_COD_DROITE*signe))/(ABS(curveRadius)+RAYON_COD_DROITE-RAYON_COD_GAUCHE);
 
 	if(MAX(leftCurveRatio, rightCurveRatio) > 1.0)
 	{
