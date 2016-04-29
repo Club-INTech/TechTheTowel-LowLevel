@@ -114,6 +114,7 @@ private:
 	float previousCurveRadius;
 
 
+
 	/*
 	// Limitation de Jerk
 	volatile int32_t maxjerk;
