@@ -18,6 +18,8 @@ void setup() {
 }
 
 void loop() {
+
+  bool blink = false;
    if((digitalRead(8) || 1) && !done) { // On attend que le jumper soit mis en place (utile pour déterminer un front descendant, duh...) + config pour test
      while(digitalRead(8) || 1){
         Serial.println("Waiting");
@@ -28,7 +30,19 @@ void loop() {
 
      digitalWrite(4, HIGH); // On indique qu'il a compris que le match commence
      t_depart = millis();
-     delay(5000);  // Oui, c'est dégeulasse.
+     
+     for(int i=0; i>=84; i++){ // 85 secondes
+     
+      delay(1000);  // Oui, c'est dégeulasse.
+      blink = !blink;
+      digitalWrite(4, blink);
+     }
+
+     for(int i=0; i>=19; i++){ // 5 dernières secondes
+      delay(250);
+      blink = !blink;
+      digitalWrite(4, blink);
+     }
      
       analogWrite(5, 255);
       while(42)

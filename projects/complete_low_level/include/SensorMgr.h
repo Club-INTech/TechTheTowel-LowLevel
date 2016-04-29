@@ -33,7 +33,7 @@ public:
 
 	bool isJumperOut() const;
 
-	void refresh();
+	void refresh(MOVING_DIRECTION);
 
 	void sensorInterrupt(int);
 

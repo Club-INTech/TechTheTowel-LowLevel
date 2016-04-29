@@ -21,7 +21,7 @@ int main(void)
 	ActuatorsMgr* actuatorsMgr = &ActuatorsMgr::Instance();
 	SensorMgr* sensorMgr = &SensorMgr::Instance();
 	BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
-	//Voltage_controller* voltage = &Voltage_controller::Instance();
+	Voltage_controller* voltage = &Voltage_controller::Instance();
 
 	char order[64];//Permet le stockage du message reçu par la liaison série
 
@@ -29,7 +29,7 @@ int main(void)
 
 	while(1)
 	{
-		sensorMgr->refresh();
+		sensorMgr->refresh(motionControlSystem->getMovingDirection());
 
 		uint8_t tailleBuffer = serial.available();
 
@@ -335,9 +335,13 @@ int main(void)
 
 
 
-/**
- * 	Réglage des constantes d'asservissement
+/*			 ___________________
+ * 		   *|                   |*
+ *		   *|CONSTANTES D'ASSERV|*
+ *		   *|___________________|*
  */
+
+
 			else if(!strcmp("toggle",order))//Bascule entre le réglage d'asserv en translation et en rotation
 			{
 				translation = !translation;
@@ -511,14 +515,17 @@ int main(void)
 				motionControlSystem->printTrackingAll();
 			}
 
+			else if(!strcmp("adc", order)) // Pour tester la tension d'alimentation selon l'adc
+			{
+				serial.printfln("%d", voltage->test());
+			}
 
 
 
-/*			 ___________
- * 		   *|           |*
- *		   *|ACTIONNEURS|*
- *		   *|___________|*
- *
+/*			 __________________
+ * 		   *|                  |*
+ *		   *|	ACTIONNEURS	   |*
+ *		   *|__________________|*
  */
 
 			/* --- AX12 ---*/
@@ -745,7 +752,12 @@ int main(void)
 				serial.printfln("%d", blocked);
 			}
 
-			/* ---Erreurs de communication : --- */
+
+/*			 __________________
+ * 		   *|                  |*
+ *		   *|  ERREURS DE COM  |*
+ *		   *|__________________|*
+ */
 
 
 			else if(!strcmp("uoe",order)) // test d'un mauvais retour bas niveau --> haut niveau
@@ -800,7 +812,7 @@ void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 			j=0;
 		}
 
-		if(k >= 2000)
+		if(k >= 200)
 		{
 			//voltage->measure();
 			k=0;

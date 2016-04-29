@@ -10,7 +10,7 @@
 Counter::Counter() {
 
 	/**
-	 * Configuration encodeur gauche sur TIMER 5 (32 bits)
+	 * Configuration encodeur DROIT sur TIMER 5 (32 bits)
 	 * Pins A0 (jaune) et A1 (vert)
 	 */
 
@@ -46,7 +46,7 @@ Counter::Counter() {
 	TIM_SetCounter(TIM5, 2147483647);
 
 	/**
-	 * Configuration encodeur droit sur TIMER 3 (16 bits) A GARDER
+	 * Configuration encodeur GAUCHE sur TIMER 3 (16 bits) A GARDER
 	 * Pins B4 et B5
 	 */
 

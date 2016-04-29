@@ -193,7 +193,8 @@ bool BinaryMotorMgr::isLeftDoorClosing(){
 /*---Gestion des blocages--*/
 
 void BinaryMotorMgr::manageBlockedDoor(){
-	SensorMgr* sensorMgr = &SensorMgr::Instance();
+	static SensorMgr* sensorMgr = &SensorMgr::Instance();
+
 	static uint32_t rightTimer = 0;
 	static uint32_t leftTimer = 0;
 
