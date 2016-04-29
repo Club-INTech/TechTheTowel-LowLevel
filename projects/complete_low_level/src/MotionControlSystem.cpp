@@ -199,7 +199,8 @@ void MotionControlSystem::control()
 	currentRightSpeed = averageRightSpeed.value();
 
 	currentDistance = (leftTicks + rightTicks) / 2;
-	currentAngle = (rightTicks - leftTicks) / 2;
+	currentAngle = ((rightTicks - currentDistance)*RAYON_COD_GAUCHE/RAYON_COD_DROITE - (leftTicks - currentDistance)) / 2;
+	//currentAngle = (rightTicks - leftTicks) / 2;
 
 
 	if(translationControlled)
