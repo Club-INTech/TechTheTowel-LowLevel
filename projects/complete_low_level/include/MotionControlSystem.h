@@ -169,6 +169,8 @@ private:
 	int toleranceSpeed; // Tolérance avant de considérer le mouvement anormal (écart entre la consigne de vitesse et la vitesse réelle)
 	int toleranceSpeedEstablished; // Tolérance autour de la vitesse établie avant de capter un blocage
 
+	int toleranceDifferentielle;
+
 	int delayToEstablish; // Temps à attendre avant de considérer la vitesse stable
 
 	float toleranceCurveRatio; // Tolérance en trajectoire courbe avant de bloquer si le rayon est mauvais
