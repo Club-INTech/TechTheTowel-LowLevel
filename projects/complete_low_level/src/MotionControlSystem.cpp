@@ -44,10 +44,10 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	toleranceTranslation = 30;
 	toleranceRotation = 50;
 	toleranceSpeed = 50;
-	toleranceSpeedEstablished = 50; // Doit être la plus petite possible, sans bloquer les trajectoires courbes
+	toleranceSpeedEstablished = 50; // Doit être la plus petite possible, sans bloquer les trajectoires courbes 50
 	delayToEstablish = 1000;
 	toleranceCurveRatio = 0.9;
-
+	toleranceDifferentielle = 500; // Pour les trajectoires "normales", vérifie que les roues ne font pas nawak chacunes de leur coté.
 
 	translationPID.setTunings(13, 0, 0);
 	rotationPID.setTunings(17, 0, 0);
@@ -305,7 +305,7 @@ void MotionControlSystem::control()
 
 
 bool MotionControlSystem::isPhysicallyStopped() {
-	return (translationPID.getDerivativeError() == 0) && (rotationPID.getDerivativeError() == 0);
+	return ((translationPID.getDerivativeError() == 0) && (rotationPID.getDerivativeError() == 0)) || (ABS(ABS(leftSpeedPID.getError())-ABS(rightSpeedPID.getError()))>toleranceDifferentielle);
 }
 
 
@@ -377,18 +377,14 @@ void MotionControlSystem::manageStop()
 		}
 	}
 
-	else if(moving && !isSpeedEstablished && curveMovement && !forcedMovement){ // Vérifie que le ratio reste bon pdt les traj courbes
+	else if(moving && !isSpeedEstablished && !forcedMovement && curveMovement){ // Vérifie que le ratio reste bon pdt les traj courbes
 			if (leftCurveRatio<rightCurveRatio && averageRightSpeed.value() !=0 && rightCurveRatio!=0){ // si on tourne a gauche
 				if (ABS((averageLeftSpeed.value()/averageRightSpeed.value())-(leftCurveRatio/rightCurveRatio))>toleranceCurveRatio){
-					int john1 = averageLeftSpeed.value();
-					int john2 = averageRightSpeed.value();
 					stop();
 					moveAbnormal = true;
 				}
 				else if(rightCurveRatio<leftCurveRatio && averageLeftSpeed.value()!=0 && leftCurveRatio!=0){ //si on tourne à droite
 					if (ABS((averageRightSpeed.value()/averageLeftSpeed.value())-(rightCurveRatio/leftCurveRatio))>toleranceCurveRatio){
-						int john1 = averageLeftSpeed.value();
-						int john2 = averageRightSpeed.value();
 						stop();
 						moveAbnormal = true;
 					}
