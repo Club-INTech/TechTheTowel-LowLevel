@@ -539,8 +539,8 @@ void MotionControlSystem::orderCurveTrajectory(float arcLength, float curveRadiu
 	if(curveRadius < 0 ) // Si le rayon de courbure est négatif, on tourne dans l'autre sens
 		signe = -1.0;
 
-	leftCurveRatio = (ABS(curveRadius)-(RAYON_COD_GAUCHE*signe))/ABS(curveRadius);
-	rightCurveRatio = (ABS(curveRadius)+(RAYON_COD_DROITE*signe))/ABS(curveRadius);
+	leftCurveRatio = (ABS(curveRadius)-(RAYON_COD_GAUCHE*signe))/(ABS(curveRadius)+RAYON_COD_DROITE-RAYON_COD_GAUCHE);
+	rightCurveRatio = (ABS(curveRadius)+(RAYON_COD_DROITE*signe))/(ABS(curveRadius)+RAYON_COD_DROITE-RAYON_COD_GAUCHE);
 
 	if(MAX(leftCurveRatio, rightCurveRatio) > 1.0)
 	{
