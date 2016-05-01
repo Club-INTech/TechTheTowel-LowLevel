@@ -794,7 +794,7 @@ void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 	volatile static uint32_t i = 0, j = 0, k = 0;
 	static MotionControlSystem* motionControlSystem = &MotionControlSystem::Instance();
 	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
-	//static Voltage_controller* voltage = &Voltage_controller::Instance();
+	static Voltage_controller* voltage = &Voltage_controller::Instance();
 
 	if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET) {
 		//Remise à 0 manuelle du flag d'interruption nécessaire
@@ -814,7 +814,7 @@ void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 
 		if(k >= 200)
 		{
-			//voltage->measure();
+			voltage->measure();
 			k=0;
 		}
 
