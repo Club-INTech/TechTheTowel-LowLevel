@@ -20,8 +20,8 @@
 // ~1000 ticks par tour de roue
 // 17cm écartement des roues
 
-#define RAYON_COD_GAUCHE 136
-#define RAYON_COD_DROITE 149
+#define RAYON_COD_GAUCHE 140
+#define RAYON_COD_DROITE 144
 
 #define TICK_TO_MM 0.2088			// unité : mm/ticks
 //#define TICK_TO_RADIAN 0.0014569	// unité : radians/ticks
