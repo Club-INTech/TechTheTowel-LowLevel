@@ -46,6 +46,8 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	toleranceSpeed = 50;
 	toleranceSpeedEstablished = 50; // Doit être la plus petite possible, sans bloquer les trajectoires courbes 50
 	delayToEstablish = 1000;
+	maxTimeNotEstablished = 1000;
+
 	toleranceCurveRatio = 0.9;
 	toleranceDifferentielle = 500; // Pour les trajectoires "normales", vérifie que les roues ne font pas nawak chacunes de leur coté.
 
@@ -340,16 +342,44 @@ void MotionControlSystem::manageStop()
 	static uint32_t time2 = 0;
 	static uint32_t time3 = 0;
 	static uint32_t timeToEstablish = 0;
+	static uint32_t timeNotEstablished = 0;
 	static bool isSpeedEstablished = false;
 
-	if (moving && averageLeftDerivativeError.value()<toleranceSpeedEstablished && averageRightDerivativeError.value()<toleranceSpeedEstablished && leftSpeedPID.getError()<toleranceSpeed && rightSpeedPID.getError()<toleranceSpeed && !forcedMovement){
+	if (moving &&
+			averageLeftDerivativeError.value()<toleranceSpeedEstablished &&
+			averageRightDerivativeError.value()<toleranceSpeedEstablished &&
+
+			leftSpeedPID.getError()<toleranceSpeed &&
+			rightSpeedPID.getError()<toleranceSpeed &&
+
+			!forcedMovement){
+
+		timeNotEstablished=0;
+
 		if(timeToEstablish==0){
 			timeToEstablish=Millis();
 		}
+
 		else if(timeToEstablish>delayToEstablish && !isSpeedEstablished){
 			isSpeedEstablished = true;
+			serial.printfln("lol je suis en vitesse etablie biatch");
 		}
 	}
+
+/*
+	else if(moving && !forcedMovement){ //écart à la consigne trop grand
+		serial.printfln("Bien je commence à voir que je suis bloque");
+			if(timeNotEstablished==0){
+				timeNotEstablished=Millis();
+				serial.printfln("not established vaut 0");
+			}
+			else if(timeNotEstablished > maxTimeNotEstablished){
+				stop();
+				moveAbnormal = true;
+				serial.printfln("la je me bloque");
+			}
+		}
+*/
 
 //-----------//
 
@@ -379,19 +409,21 @@ void MotionControlSystem::manageStop()
 	}
 
 	else if(moving && !isSpeedEstablished && !forcedMovement && curveMovement){ // Vérifie que le ratio reste bon pdt les traj courbes
-			if (leftCurveRatio<rightCurveRatio && averageRightSpeed.value() !=0 && rightCurveRatio!=0){ // si on tourne a gauche
+
+		if (leftCurveRatio<rightCurveRatio && averageRightSpeed.value() !=0 && rightCurveRatio!=0){ // si on tourne a gauche
 				if (ABS((averageLeftSpeed.value()/averageRightSpeed.value())-(leftCurveRatio/rightCurveRatio))>toleranceCurveRatio){
 					stop();
 					moveAbnormal = true;
 				}
-				else if(rightCurveRatio<leftCurveRatio && averageLeftSpeed.value()!=0 && leftCurveRatio!=0){ //si on tourne à droite
-					if (ABS((averageRightSpeed.value()/averageLeftSpeed.value())-(rightCurveRatio/leftCurveRatio))>toleranceCurveRatio){
-						stop();
-						moveAbnormal = true;
-					}
+			}
+		else if(rightCurveRatio<leftCurveRatio && averageLeftSpeed.value()!=0 && leftCurveRatio!=0){ //si on tourne à droite
+				if (ABS((averageRightSpeed.value()/averageLeftSpeed.value())-(rightCurveRatio/leftCurveRatio))>toleranceCurveRatio){
+					stop();
+					moveAbnormal = true;
 				}
 			}
 		}
+
 
 	else if ((isLeftWheelSpeedAbnormal() || isRightWheelSpeedAbnormal()) && curveMovement && !forcedMovement) // Sert a vérifier que les consignes de vitesse sont bien respectées (blocage pour les trajectoires courbes)
 	{

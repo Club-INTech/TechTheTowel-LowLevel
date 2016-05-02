@@ -177,6 +177,7 @@ private:
 	int toleranceDifferentielle;
 
 	int delayToEstablish; // Temps à attendre avant de considérer la vitesse stable
+	int maxTimeNotEstablished;
 
 	float toleranceCurveRatio; // Tolérance en trajectoire courbe avant de bloquer si le rayon est mauvais
 	/*
