@@ -17,7 +17,7 @@ bool leftDoorClosing = false;
 bool RightDoorBlocked = false;
 bool LeftDoorBlocked = false;
 
-uint32_t timeToStopDoor = 300;
+uint32_t timeToStopDoor = 800;
 uint32_t timeTooLong = 6000;
 
 BinaryMotorMgr::BinaryMotorMgr() {
