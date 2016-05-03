@@ -1,11 +1,11 @@
-*~
+﻿*~
 *.o
 *.so
 *.cogui
 *.comarker
 /build/
 
-**/projects/**/*.coproj
+
 
 #Fichiers python compilés
 *.pyc
