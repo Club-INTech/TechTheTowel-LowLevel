@@ -290,7 +290,7 @@ void MotionControlSystem::control()
 	previousLeftSpeedSetpoint = leftSpeedSetpoint;
 	previousRightSpeedSetpoint = rightSpeedSetpoint;
 
-	//serial.printfln("%d",(leftSpeedSetpoint - currentLeftSpeed));
+
 
 	if(leftSpeedControlled)
 		leftSpeedPID.compute();		// Actualise la valeur de 'leftPWM'
@@ -362,7 +362,7 @@ void MotionControlSystem::manageStop()
 
 		else if(timeToEstablish>delayToEstablish && !isSpeedEstablished){
 			isSpeedEstablished = true;
-			serial.printfln("lol je suis en vitesse etablie biatch");
+
 		}
 	}
 
