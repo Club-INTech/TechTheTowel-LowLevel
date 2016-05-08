@@ -19,7 +19,7 @@ FLIP_ORDER permet d'actualiser l'affichage
 
 
 // Indique s'il s'agit du code de l'oeuil gauche ou droit
-#define GAUCHE
+#define DROIT
 
 
 
