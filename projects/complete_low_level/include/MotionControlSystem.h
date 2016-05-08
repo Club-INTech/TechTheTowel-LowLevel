@@ -20,8 +20,12 @@
 // ~1000 ticks par tour de roue
 // 17cm écartement des roues
 
+#define RAYON_COD_GAUCHE 140
+#define RAYON_COD_DROITE 144
+
 #define TICK_TO_MM 0.2088			// unité : mm/ticks
-#define TICK_TO_RADIAN 0.0014569	// unité : radians/ticks
+//#define TICK_TO_RADIAN 0.0014569	// unité : radians/ticks
+#define TICK_TO_RADIAN (TICK_TO_MM/RAYON_COD_GAUCHE)
 
 #define AVERAGE_SPEED_SIZE	25
 #define AVERAGE_DERIVATIVE_SIZE 100
@@ -110,6 +114,7 @@ private:
 	float previousCurveRadius;
 
 
+
 	/*
 	// Limitation de Jerk
 	volatile int32_t maxjerk;
@@ -169,7 +174,10 @@ private:
 	int toleranceSpeed; // Tolérance avant de considérer le mouvement anormal (écart entre la consigne de vitesse et la vitesse réelle)
 	int toleranceSpeedEstablished; // Tolérance autour de la vitesse établie avant de capter un blocage
 
+	int toleranceDifferentielle;
+
 	int delayToEstablish; // Temps à attendre avant de considérer la vitesse stable
+	int maxTimeNotEstablished;
 
 	float toleranceCurveRatio; // Tolérance en trajectoire courbe avant de bloquer si le rayon est mauvais
 	/*

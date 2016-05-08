@@ -44,10 +44,12 @@ MotionControlSystem::MotionControlSystem(): leftMotor(Side::LEFT), rightMotor(Si
 	toleranceTranslation = 30;
 	toleranceRotation = 50;
 	toleranceSpeed = 50;
-	toleranceSpeedEstablished = 50; // Doit être la plus petite possible, sans bloquer les trajectoires courbes
+	toleranceSpeedEstablished = 50; // Doit être la plus petite possible, sans bloquer les trajectoires courbes 50
 	delayToEstablish = 1000;
-	toleranceCurveRatio = 0.9;
+	maxTimeNotEstablished = 1000;
 
+	toleranceCurveRatio = 0.9;
+	toleranceDifferentielle = 500; // Pour les trajectoires "normales", vérifie que les roues ne font pas nawak chacunes de leur coté.
 
 	translationPID.setTunings(13, 0, 0);
 	rotationPID.setTunings(17, 0, 0);
@@ -198,8 +200,9 @@ void MotionControlSystem::control()
 	currentLeftSpeed = averageLeftSpeed.value(); // On utilise pour l'asserv la valeur moyenne des dernieres current Speed
 	currentRightSpeed = averageRightSpeed.value();
 
+
 	currentDistance = (leftTicks + rightTicks) / 2;
-	currentAngle = (rightTicks - leftTicks) / 2;
+	currentAngle = ((rightTicks - currentDistance)*RAYON_COD_GAUCHE/RAYON_COD_DROITE - (leftTicks - currentDistance)) / 2;
 
 
 	if(translationControlled)
@@ -287,7 +290,7 @@ void MotionControlSystem::control()
 	previousLeftSpeedSetpoint = leftSpeedSetpoint;
 	previousRightSpeedSetpoint = rightSpeedSetpoint;
 
-	//serial.printfln("%d",(leftSpeedSetpoint - currentLeftSpeed));
+
 
 	if(leftSpeedControlled)
 		leftSpeedPID.compute();		// Actualise la valeur de 'leftPWM'
@@ -305,7 +308,7 @@ void MotionControlSystem::control()
 
 
 bool MotionControlSystem::isPhysicallyStopped() {
-	return (translationPID.getDerivativeError() == 0) && (rotationPID.getDerivativeError() == 0);
+	return ((translationPID.getDerivativeError() == 0) && (rotationPID.getDerivativeError() == 0)) || (ABS(ABS(leftSpeedPID.getError())-ABS(rightSpeedPID.getError()))>toleranceDifferentielle);
 }
 
 
@@ -339,16 +342,44 @@ void MotionControlSystem::manageStop()
 	static uint32_t time2 = 0;
 	static uint32_t time3 = 0;
 	static uint32_t timeToEstablish = 0;
+	static uint32_t timeNotEstablished = 0;
 	static bool isSpeedEstablished = false;
 
-	if (moving && averageLeftDerivativeError.value()<toleranceSpeedEstablished && averageRightDerivativeError.value()<toleranceSpeedEstablished && leftSpeedPID.getError()<toleranceSpeed && rightSpeedPID.getError()<toleranceSpeed && !forcedMovement){
+	if (moving &&
+			averageLeftDerivativeError.value()<toleranceSpeedEstablished &&
+			averageRightDerivativeError.value()<toleranceSpeedEstablished &&
+
+			leftSpeedPID.getError()<toleranceSpeed &&
+			rightSpeedPID.getError()<toleranceSpeed &&
+
+			!forcedMovement){
+
+		timeNotEstablished=0;
+
 		if(timeToEstablish==0){
 			timeToEstablish=Millis();
 		}
+
 		else if(timeToEstablish>delayToEstablish && !isSpeedEstablished){
 			isSpeedEstablished = true;
+
 		}
 	}
+
+/*
+	else if(moving && !forcedMovement){ //écart à la consigne trop grand
+		serial.printfln("Bien je commence à voir que je suis bloque");
+			if(timeNotEstablished==0){
+				timeNotEstablished=Millis();
+				serial.printfln("not established vaut 0");
+			}
+			else if(timeNotEstablished > maxTimeNotEstablished){
+				stop();
+				moveAbnormal = true;
+				serial.printfln("la je me bloque");
+			}
+		}
+*/
 
 //-----------//
 
@@ -377,24 +408,22 @@ void MotionControlSystem::manageStop()
 		}
 	}
 
-	else if(moving && !isSpeedEstablished && curveMovement && !forcedMovement){ // Vérifie que le ratio reste bon pdt les traj courbes
-			if (leftCurveRatio<rightCurveRatio && averageRightSpeed.value() !=0 && rightCurveRatio!=0){ // si on tourne a gauche
+	else if(moving && !isSpeedEstablished && !forcedMovement && curveMovement){ // Vérifie que le ratio reste bon pdt les traj courbes
+
+		if (leftCurveRatio<rightCurveRatio && averageRightSpeed.value() !=0 && rightCurveRatio!=0){ // si on tourne a gauche
 				if (ABS((averageLeftSpeed.value()/averageRightSpeed.value())-(leftCurveRatio/rightCurveRatio))>toleranceCurveRatio){
-					int john1 = averageLeftSpeed.value();
-					int john2 = averageRightSpeed.value();
 					stop();
 					moveAbnormal = true;
 				}
-				else if(rightCurveRatio<leftCurveRatio && averageLeftSpeed.value()!=0 && leftCurveRatio!=0){ //si on tourne à droite
-					if (ABS((averageRightSpeed.value()/averageLeftSpeed.value())-(rightCurveRatio/leftCurveRatio))>toleranceCurveRatio){
-						int john1 = averageLeftSpeed.value();
-						int john2 = averageRightSpeed.value();
-						stop();
-						moveAbnormal = true;
-					}
+			}
+		else if(rightCurveRatio<leftCurveRatio && averageLeftSpeed.value()!=0 && leftCurveRatio!=0){ //si on tourne à droite
+				if (ABS((averageRightSpeed.value()/averageLeftSpeed.value())-(rightCurveRatio/leftCurveRatio))>toleranceCurveRatio){
+					stop();
+					moveAbnormal = true;
 				}
 			}
 		}
+
 
 	else if ((isLeftWheelSpeedAbnormal() || isRightWheelSpeedAbnormal()) && curveMovement && !forcedMovement) // Sert a vérifier que les consignes de vitesse sont bien respectées (blocage pour les trajectoires courbes)
 	{
@@ -536,14 +565,14 @@ void MotionControlSystem::orderRotation(float angleConsigneRadian, RotationWay r
 void MotionControlSystem::orderCurveTrajectory(float arcLength, float curveRadius)
 {
 	previousCurveRadius = curveRadius;
-	float radiusDiff = WHEEL_DISTANCE_TO_CENTER;
 	float finalAngle = (arcLength / ABS(curveRadius)) + getAngleRadian();
+	float signe = 1.0;
 
 	if(curveRadius < 0 ) // Si le rayon de courbure est négatif, on tourne dans l'autre sens
-		radiusDiff = (-1)*radiusDiff;
+		signe = -1.0;
 
-	leftCurveRatio = (ABS(curveRadius)-radiusDiff)/ABS(curveRadius);
-	rightCurveRatio = (ABS(curveRadius)+radiusDiff)/ABS(curveRadius);
+	leftCurveRatio = (ABS(curveRadius)-(RAYON_COD_GAUCHE*signe))/(ABS(curveRadius)+RAYON_COD_DROITE-RAYON_COD_GAUCHE);
+	rightCurveRatio = (ABS(curveRadius)+(RAYON_COD_DROITE*signe))/(ABS(curveRadius)+RAYON_COD_DROITE-RAYON_COD_GAUCHE);
 
 	if(MAX(leftCurveRatio, rightCurveRatio) > 1.0)
 	{

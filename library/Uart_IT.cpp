@@ -21,10 +21,16 @@ template<> USART_TypeDef* Uart<6>::USARTx = USART6;
 extern "C" {
 #endif
 void USART1_IRQHandler(void) {
-	if (USART_GetITStatus(USART1, USART_IT_RXNE)) {
-		unsigned char c = USART_ReceiveData(USART1);
+	if(USART_SR_RXNE & USART1->SR)
+	{
+		uint16_t c = USART1->DR & 0xFF;
 		Uart<1>::store_char(c);
 	}
+
+	/*if (USART_GetITStatus(USART1, USART_IT_RXNE)) {
+		unsigned char c = USART_ReceiveData(USART1);
+		Uart<1>::store_char(c);
+	}*/
 }
 void USART2_IRQHandler(void) {
 	if (USART_GetITStatus(USART2, USART_IT_RXNE)) {

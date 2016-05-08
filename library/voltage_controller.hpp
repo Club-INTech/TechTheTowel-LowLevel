@@ -22,13 +22,15 @@ public:
 	{
 		counter = 0;
 		blink = false;
-		minimal_voltage = 3100;
-		voltage_echelon = 50;
+		minimal_voltage = 2850;
+		usb_voltage = 600;
+		voltage_echelon = 80;
 
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 
 		GPIO_InitTypeDef GPIO_InitStruct;
 		GPIO_StructInit(&GPIO_InitStruct); //Remplit avec les valeurs par défaut
@@ -101,6 +103,15 @@ public:
 		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
 		GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+
+		GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1; // BUZZER !!!
+		GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+		GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+		GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+		GPIO_StructInit(&GPIO_InitStruct);
+
+
 		adc_configure();
 
 	}
@@ -111,6 +122,8 @@ public:
 		ADCValue = adc_convert();
 
 		clear_leds();
+
+		GPIO_ResetBits(GPIOE, GPIO_Pin_1);
 
 		if(ADCValue >= voltage_echelon*9 + minimal_voltage )
 		{
@@ -154,11 +167,11 @@ public:
 		}
 		if(ADCValue < minimal_voltage)
 		{
-			counter++;
-			if(counter >= 10) // On utilise un compteur pour éviter un blocage en cas de mauvaise lecture exceptionnelle
-			{
-				static MotionControlSystem* motionControlSystem = &MotionControlSystem::Instance();
-				motionControlSystem->stop();
+
+				if(ADCValue >= usb_voltage)
+					GPIO_SetBits(GPIOE, GPIO_Pin_1);
+
+
 				if(blink)
 				{
 					GPIO_SetBits(GPIOC, GPIO_Pin_7);
@@ -169,16 +182,17 @@ public:
 				}
 				blink = !blink;
 			}
-		} else {
-			counter = 0;
 		}
 
-	}
 
+	int test(){
+		return(adc_convert());
+	}
 private:
 
 	uint32_t voltage_echelon; //Cherches pas, y'a pas d'unité SI.
 	uint32_t minimal_voltage; //Là non plus.
+	uint32_t usb_voltage;
 	int counter; //Là t'es con si t'en cherches une...
 	bool blink;
 
