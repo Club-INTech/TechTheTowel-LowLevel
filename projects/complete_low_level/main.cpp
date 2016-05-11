@@ -535,11 +535,20 @@ int main(void)
 				actuatorsMgr->setAllID();
 			}
 
-			else if(!strcmp("fpr",order)) // Descente du bras droit aimanté (poissons)
+			else if(!strcmp("fprh",order)) // Descente du bras droit aimanté (poissons)
 			{
-				actuatorsMgr->fishingRight();
+				actuatorsMgr->fishingRightUp();
 			}
 
+			else if(!strcmp("fprm",order)) // Descente du bras droit aimanté (poissons)
+			{
+				actuatorsMgr->fishingRightMid();
+			}
+
+			else if(!strcmp("fprl",order)) // Descente du bras droit aimanté (poissons)
+			{
+				actuatorsMgr->fishingRightDown();
+			}
 
 			else if(!strcmp("mpr",order))
 			{
@@ -568,9 +577,17 @@ int main(void)
 
 			}
 
-			else if(!strcmp("fpl",order)) // Descente du bras gauche aimanté (poissons)
+			else if(!strcmp("fplm",order)) // Descente du bras gauche aimanté (poissons)
 			{
-				actuatorsMgr->fishingLeft();
+				actuatorsMgr->fishingLeftMid();
+			}
+			else if(!strcmp("fplh",order)) // Descente du bras gauche aimanté (poissons)
+			{
+				actuatorsMgr->fishingLeftUp();
+			}
+			else if(!strcmp("fpll",order)) // Descente du bras gauche aimanté (poissons)
+			{
+				actuatorsMgr->fishingLeftDown();
 			}
 
 			else if(!strcmp("mpl",order))
