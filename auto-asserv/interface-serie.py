@@ -18,7 +18,7 @@ class serialCom:
     def ping(self):
         
         self.port_serie.write("?\r\n")
-    
+          
     def ecouter(self):
         a=self.port_serie.readline() 
         #print a
@@ -34,7 +34,7 @@ class serialCom:
     def quitter(self):
         self.port_serie.close()
 
-com=serialCom("COM10")
+com=serialCom("COM6")
 print("--------------------------\n\n")
 m=""
 a=""

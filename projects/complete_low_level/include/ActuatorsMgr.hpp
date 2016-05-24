@@ -23,7 +23,9 @@ extern Uart<1> serial;
 
 // on définit les différents angles utilisés pour le coté gauche et le coté droit
 
-#define fishingRightPosition 155
+#define fishingRightPositionUp 160
+#define fishingRightPositionMid 155
+#define fishingRightPositionDown 150
 #define initialRightPosition 230
 #define middleRightPosition 200
 #define fingerRightInitialPosition 150
@@ -32,7 +34,9 @@ extern Uart<1> serial;
 
 
 // Coté gauche
-#define fishingLeftPosition 145 //valeur peu êter un peu élevé
+#define fishingLeftPositionDown 150
+#define fishingLeftPositionMid 145 //valeur peu êter un peu élevé
+#define fishingLeftPositionUp 140
 #define initialLeftPosition 70
 #define middleLeftPosition 100
 #define fingerLeftInitialPosition 50
@@ -100,15 +104,35 @@ public:
 
 
 
-	void fishingRight() {
+	void fishingRightMid() {
 		ax12MagnetsRight->changeSpeed(slowSpeed);
-		ax12MagnetsRight->goTo(fishingRightPosition);
+		ax12MagnetsRight->goTo(fishingRightPositionMid);
 	}
 
-	void fishingLeft() {
+	void fishingRightUp() {
+			ax12MagnetsRight->changeSpeed(slowSpeed);
+			ax12MagnetsRight->goTo(fishingRightPositionUp);
+		}
+
+	void fishingRightDown() {
+			ax12MagnetsRight->changeSpeed(slowSpeed);
+			ax12MagnetsRight->goTo(fishingRightPositionDown);
+		}
+
+	void fishingLeftMid() {
 		ax12MagnetsLeft->changeSpeed(slowSpeed);
-		ax12MagnetsLeft->goTo(fishingLeftPosition);
+		ax12MagnetsLeft->goTo(fishingLeftPositionMid);
 	}
+
+	void fishingLeftUp() {
+			ax12MagnetsLeft->changeSpeed(slowSpeed);
+			ax12MagnetsLeft->goTo(fishingLeftPositionUp);
+		}
+
+	void fishingLeftDown() {
+			ax12MagnetsLeft->changeSpeed(slowSpeed);
+			ax12MagnetsLeft->goTo(fishingLeftPositionDown);
+		}
 
 	void midPositionRight() {
 		ax12MagnetsRight->changeSpeed(slowSpeed);

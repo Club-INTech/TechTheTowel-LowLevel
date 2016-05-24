@@ -3,7 +3,7 @@
 #include "delay.h"
 #include "ActuatorsMgr.hpp"
 #include "SensorMgr.h"
-//#include "voltage_controller.hpp"
+#include "voltage_controller.hpp"
 #include "BinaryMotorMgr.hpp"
 
 
@@ -14,13 +14,14 @@ int main(void)
 	Uart<2> serial_ax;
 	serial.init(115200);
 	serial_ax.init(9600);
+	serial_ax.disable_rx();
 
 	MotionControlSystem* motionControlSystem = &MotionControlSystem::Instance(); // motionControlSystem est tout simplement un pointeur vers une référence d'un objet de type MotionControlSystem #TRIVIAL #USELESS
 	motionControlSystem->init();
 	ActuatorsMgr* actuatorsMgr = &ActuatorsMgr::Instance();
 	SensorMgr* sensorMgr = &SensorMgr::Instance();
 	BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
-	//voltage_controller* voltage = &voltage_controller::Instance();
+	Voltage_controller* voltage = &Voltage_controller::Instance();
 
 	char order[64];//Permet le stockage du message reçu par la liaison série
 
@@ -28,7 +29,7 @@ int main(void)
 
 	while(1)
 	{
-		sensorMgr->refresh();
+		sensorMgr->refresh(motionControlSystem->getMovingDirection());
 
 		uint8_t tailleBuffer = serial.available();
 
@@ -94,6 +95,16 @@ int main(void)
 				motionControlSystem->orderCurveTrajectory(arcLenght, curveRadius);
 			}
 
+			else if(!strcmp("efm", order)) // Activer les mouvements forcés (sans blocage)
+			{
+				motionControlSystem->enableForcedMovement();
+			}
+
+			else if(!strcmp("dfm", order)) // désactive le forçage
+			{
+				motionControlSystem->disableForcedMovement();
+			}
+
 
 			else if(!strcmp("t3", order))		//Ordre de rotation via un angle relatif (en radians)
 			{
@@ -117,8 +128,9 @@ int main(void)
 			{
 				serial.printfln("%d", sensorMgr->getSensorDistanceAVG());//en mm
 				serial.printfln("%d", sensorMgr->getSensorDistanceAVD());//en mm
-				serial.printfln("%d", sensorMgr->getSensorDistanceARG());//en mm
-				serial.printfln("%d", sensorMgr->getSensorDistanceARD());//en mm
+				serial.printfln("%d", sensorMgr->getSensorDistanceARG());//en mm // qui représente AVD en fait
+				serial.printfln("%d", sensorMgr->getSensorDistanceARD());//en mm // qui représente l'arrière.
+				//serial.printfln("0"); // Pour que le haut niveau gueule pas en disant "OMG IL Y A QUE 3 REPONSES SUR 4 !" #Mongol
 			}
 			else if(!strcmp("j",order))			//Indiquer l'état du jumper (0='en place'; 1='dehors')
 			{
@@ -140,6 +152,15 @@ int main(void)
 			{
 				motionControlSystem->enableRotationControl(true);
 			}
+			else if(!strcmp("cv0",order))		//Activer l'asservissement en rotation
+			{
+				motionControlSystem->enableSpeedControl(false);
+			}
+			else if(!strcmp("cv1",order))		//Activer l'asservissement en rotation
+			{
+				motionControlSystem->enableSpeedControl(true);
+			}
+
 			else if(!strcmp("cx",order))		//Régler la composante x de la position (en mm)
 			{
 				float x;
@@ -176,8 +197,48 @@ int main(void)
 				motionControlSystem->setRotationSpeed(speedRotation);
 			}
 
+			else if(!strcmp("ssa", order))
+			{
+				motionControlSystem->setSmoothAcceleration();
+			}
 
+			else if(!strcmp("sva", order))
+			{
+				motionControlSystem->setViolentAcceleration();
+			}
 
+			// POUR MONTLHERY
+
+			else if(!strcmp("montlhery", order))
+			{
+				motionControlSystem->enableTranslationControl(false);
+				motionControlSystem->enableRotationControl(false);
+			}
+
+			else if(!strcmp("av", order))
+			{
+				motionControlSystem->setRawPositiveTranslationSpeed();
+			}
+
+			else if(!strcmp("rc", order))
+			{
+				motionControlSystem->setRawNegativeTranslationSpeed();
+			}
+
+			else if(!strcmp("td", order))
+			{
+				motionControlSystem->setRawNegativeRotationSpeed();
+			}
+
+			else if(!strcmp("tg", order))
+			{
+				motionControlSystem->setRawPositiveRotationSpeed();
+			}
+
+			else if(!strcmp("sstop", order)) // Stoppe l'asserv en vitesse
+			{
+				motionControlSystem->setRawNullSpeed();
+			}
 
 
 /*			 __________________
@@ -258,7 +319,7 @@ int main(void)
 				motionControlSystem->testRotation();
 			}
 
-			else if(!strcmp("av", order))
+			else if(!strcmp("av", order)) // desactive asserv vitesse
 			{
 				static bool asservVitesse = false;
 				motionControlSystem->enableSpeedControl(asservVitesse);
@@ -274,9 +335,13 @@ int main(void)
 
 
 
-/**
- * 	Réglage des constantes d'asservissement
+/*			 ___________________
+ * 		   *|                   |*
+ *		   *|CONSTANTES D'ASSERV|*
+ *		   *|___________________|*
  */
+
+
 			else if(!strcmp("toggle",order))//Bascule entre le réglage d'asserv en translation et en rotation
 			{
 				translation = !translation;
@@ -450,14 +515,17 @@ int main(void)
 				motionControlSystem->printTrackingAll();
 			}
 
+			else if(!strcmp("adc", order)) // Pour tester la tension d'alimentation selon l'adc
+			{
+				serial.printfln("%d", voltage->test());
+			}
 
 
 
-/*			 ___________
- * 		   *|           |*
- *		   *|ACTIONNEURS|*
- *		   *|___________|*
- *
+/*			 __________________
+ * 		   *|                  |*
+ *		   *|	ACTIONNEURS	   |*
+ *		   *|__________________|*
  */
 
 			/* --- AX12 ---*/
@@ -467,9 +535,19 @@ int main(void)
 				actuatorsMgr->setAllID();
 			}
 
-			else if(!strcmp("fpr",order)) // Descente du bras droit aimanté (poissons)
+			else if(!strcmp("fprh",order)) // Descente du bras droit aimanté (poissons)
 			{
-				actuatorsMgr->fishingRight();
+				actuatorsMgr->fishingRightUp();
+			}
+
+			else if(!strcmp("fprm",order)) // Descente du bras droit aimanté (poissons)
+			{
+				actuatorsMgr->fishingRightMid();
+			}
+
+			else if(!strcmp("fprl",order)) // Descente du bras droit aimanté (poissons)
+			{
+				actuatorsMgr->fishingRightDown();
 			}
 
 			else if(!strcmp("mpr",order))
@@ -499,9 +577,17 @@ int main(void)
 
 			}
 
-			else if(!strcmp("fpl",order)) // Descente du bras gauche aimanté (poissons)
+			else if(!strcmp("fplm",order)) // Descente du bras gauche aimanté (poissons)
 			{
-				actuatorsMgr->fishingLeft();
+				actuatorsMgr->fishingLeftMid();
+			}
+			else if(!strcmp("fplh",order)) // Descente du bras gauche aimanté (poissons)
+			{
+				actuatorsMgr->fishingLeftUp();
+			}
+			else if(!strcmp("fpll",order)) // Descente du bras gauche aimanté (poissons)
+			{
+				actuatorsMgr->fishingLeftDown();
 			}
 
 			else if(!strcmp("mpl",order))
@@ -594,19 +680,36 @@ int main(void)
 			/* --- Portes sable ---*/
 
 			else if(!strcmp("odl", order)) {
-				binaryMotorMgr->runForwardLeft();
+				bool value = sensorMgr->isLeftDoorOpen();
+				if(!value){ // Si la porte n'est pas en fin de course ouverte
+					binaryMotorMgr->setLeftDoorOpening(true);
+					binaryMotorMgr->runForwardLeft(); //ouvrir
+
+				}
 			}
 
 			else if(!strcmp("odr", order)) {
-				binaryMotorMgr->runForwardRight();
+				bool value = sensorMgr->isRightDoorOpen();
+				if(!value) {
+					binaryMotorMgr->setRightDoorOpening(true);
+					binaryMotorMgr->runForwardRight();
+				}
 			}
 
 			else if(!strcmp("cdl", order)) {
-				binaryMotorMgr->runBackwardLeft();
+				bool value = sensorMgr->isLeftDoorClosed();
+					if(!value) {
+						binaryMotorMgr->setLeftDoorClosing(true);
+						binaryMotorMgr->runBackwardLeft();
+					}
 			}
 
 			else if(!strcmp("cdr", order)) {
-				binaryMotorMgr->runBackwardRight();
+				bool value = sensorMgr->isRightDoorClosed();
+					if(!value) {
+						binaryMotorMgr->setRightDoorClosing(true);
+						binaryMotorMgr->runBackwardRight();
+					}
 			}
 
 			else if(!strcmp("sdr", order)) {
@@ -636,10 +739,42 @@ int main(void)
 				binaryMotorMgr->stopAxisRight();
 			}
 
+			else if(!strcmp("irdo", order)) { // is Right Door Open
+				bool door = sensorMgr->isRightDoorOpen();
+				serial.printfln("%d", door);
+			}
+
+			else if(!strcmp("ildo", order)) {
+				bool door = sensorMgr->isLeftDoorOpen();
+				serial.printfln("%d", door);
+			}
+
+			else if(!strcmp("irdc", order)) {
+				bool door = sensorMgr->isRightDoorClosed();
+				serial.printfln("%d", door);
+			}
+
+			else if(!strcmp("ildc", order)) {
+				bool door = sensorMgr->isLeftDoorClosed();
+				serial.printfln("%d", door);
+			}
+
+			else if(!strcmp("irdb", order)){
+				bool blocked = binaryMotorMgr->isRightDoorBlocked();
+				serial.printfln("%d", blocked);
+			}
+
+			else if(!strcmp("ildb", order)){
+				bool blocked = binaryMotorMgr->isLeftDoorBlocked();
+				serial.printfln("%d", blocked);
+			}
 
 
-
-			/* ---Erreurs de communication : --- */
+/*			 __________________
+ * 		   *|                  |*
+ *		   *|  ERREURS DE COM  |*
+ *		   *|__________________|*
+ */
 
 
 			else if(!strcmp("uoe",order)) // test d'un mauvais retour bas niveau --> haut niveau
@@ -661,6 +796,8 @@ int main(void)
 			serial.printfln("CRITICAL OVERFLOW !");
 			motionControlSystem->enableTranslationControl(false);
 			motionControlSystem->enableRotationControl(false);
+			motionControlSystem->enableSpeedControl(false);
+
 			while(true)
 				;
 		}
@@ -673,7 +810,8 @@ extern "C" {
 void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 	volatile static uint32_t i = 0, j = 0, k = 0;
 	static MotionControlSystem* motionControlSystem = &MotionControlSystem::Instance();
-	//static voltage_controller* voltage = &voltage_controller::Instance();
+	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
+	static Voltage_controller* voltage = &Voltage_controller::Instance();
 
 	if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET) {
 		//Remise à 0 manuelle du flag d'interruption nécessaire
@@ -683,20 +821,17 @@ void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 		motionControlSystem->control();
 		motionControlSystem->updatePosition();
 
-		if (i >= 10) { //5ms
-			//Gestion de l'arrêt
-			motionControlSystem->manageStop();
-			i = 0;
-		}
 
 		if(j >= 5){ //2.5ms
 			motionControlSystem->track();
+			motionControlSystem->manageStop();
+			binaryMotorMgr->manageBlockedDoor();
 			j=0;
 		}
 
-		if(k >= 2000)
+		if(k >= 200)
 		{
-			//voltage->measure();
+			voltage->measure();
 			k=0;
 		}
 
@@ -708,49 +843,164 @@ void TIM4_IRQHandler(void) { //2kHz = 0.0005s = 0.5ms
 
 void EXTI9_5_IRQHandler(void)
 {
-	static SensorMgr* sensorMgr = &SensorMgr::Instance();
-
+	static SensorMgr* sensorMgr = &SensorMgr::Instance(); // Capteurs US
+/*
 	//Interruptions de l'ultrason de test
-    if (EXTI_GetITStatus(EXTI_Line6) != RESET) {
-        sensorMgr->sensorInterrupt(6);
-        //serial.printfln("interrupt 6");
-        /* Clear interrupt flag */
-        EXTI_ClearITPendingBit(EXTI_Line6);
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
+        sensorMgr->sensorInterrupt(5);
+
+        // Clear interrupt flag
+        EXTI_ClearITPendingBit(EXTI_Line5);
+
     }
+*/
+
+    if (EXTI_GetITStatus(EXTI_Line7) != RESET) {
+    	sensorMgr->AVGInterrupt();
+        //serial.printfln("7");
+
+
+        /* Clear interrupt flag */
+        EXTI_ClearITPendingBit(EXTI_Line7);
+    }
+    if (EXTI_GetITStatus(EXTI_Line6) != RESET) {
+           sensorMgr->ARDInterrupt();
+           //serial.printfln("6");
+
+           /* Clear interrupt flag */
+           EXTI_ClearITPendingBit(EXTI_Line6);
+       }
+
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET) {
+    	sensorMgr->AVDInterrupt();
+        //serial.printfln("5");
+
+
+    	/* Clear interrupt flag */
+    	EXTI_ClearITPendingBit(EXTI_Line5);
+    }
+
+    if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
+    	while(42){
+    		}
+			   EXTI_ClearITPendingBit(EXTI_Line8);
+		   }
+
+    if (EXTI_GetITStatus(EXTI_Line9) != RESET) {
+    	while(42){
+    		}
+    		EXTI_ClearITPendingBit(EXTI_Line9);
+           }
+
 }
 
-void EXTI0_IRQHandler(void) // Capteur fin de course droite ouverte
+void EXTI0_IRQHandler(void) // Capteur fin de course Droite ouverte
 {
-	/*
-	Uart<1> serial;
-	serial.init(115200);
-	serial.println("INTERRUPTION PC0 MOTHERFUCKER !!!");
-	*/
+
+	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
+
+	if(!binaryMotorMgr->isRightDoorClosing()){ // Sécurité : N'arrete pas le moteur il est en train d'ouvrir (problème de front montant du capteur)
+		binaryMotorMgr->stopRightDoor(); // stopper sur front montant
+		binaryMotorMgr->setRightDoorOpening(false);
+	}
+	EXTI_ClearITPendingBit(EXTI_Line0);
+
 }
 
-void EXTI1_IRQHandler(void) // Capteur fin de course
+void EXTI15_10_IRQHandler(void)
 {
-	/*
-	Uart<1> serial;
-	serial.init(115200);
-	serial.println("INTERRUPTION PC1 MOTHERFUCKER !!!");
-	*/
+	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
+
+	if(EXTI_GetITStatus(EXTI_Line13) != RESET) { // Droite fermée
+		if(!binaryMotorMgr->isRightDoorOpening()){
+
+			binaryMotorMgr->stopRightDoor();
+			binaryMotorMgr->setRightDoorClosing(false);
+		}
+		EXTI_ClearITPendingBit(EXTI_Line13);
+	}
+	else if(EXTI_GetITStatus(EXTI_Line15) != RESET) { // Gauche ouverte
+		if(!binaryMotorMgr->isLeftDoorClosing()){
+
+			binaryMotorMgr->stopLeftDoor();
+			binaryMotorMgr->setLeftDoorOpening(false);
+		}
+		EXTI_ClearITPendingBit(EXTI_Line15);
+	}
+
+	if (EXTI_GetITStatus(EXTI_Line10) != RESET) {
+		while(42){
+			}
+		EXTI_ClearITPendingBit(EXTI_Line10);
+	           }
+	if (EXTI_GetITStatus(EXTI_Line11) != RESET) {
+		while(42){
+			}
+		EXTI_ClearITPendingBit(EXTI_Line11);
+	           }
+	if (EXTI_GetITStatus(EXTI_Line12) != RESET) {
+		while(42){
+			}
+		EXTI_ClearITPendingBit(EXTI_Line12);
+	           }
+	if (EXTI_GetITStatus(EXTI_Line14) != RESET) {
+		while(42){
+			}
+		EXTI_ClearITPendingBit(EXTI_Line14);
+	           }
+
+
+}
+
+
+void EXTI1_IRQHandler(void) // Gauche fermée
+{
+
+	static BinaryMotorMgr* binaryMotorMgr = &BinaryMotorMgr::Instance();
+
+	if(!binaryMotorMgr->isLeftDoorOpening())
+	{
+		binaryMotorMgr->stopLeftDoor();
+		binaryMotorMgr->setLeftDoorClosing(false);
+	}
+	EXTI_ClearITPendingBit(EXTI_Line1);
+
 }
 
 
 
 
-void EXTI4_IRQHandler(void)
+void EXTI4_IRQHandler(void) // Capteur AVD (celui qui a foutu la merde, et qui est sensé être en PA5)
 {
 	static SensorMgr* sensorMgr = &SensorMgr::Instance();
 
 	if (EXTI_GetITStatus(EXTI_Line4) != RESET) {
-	        sensorMgr->sensorInterrupt(4);
+	        sensorMgr->ARGInterrupt();
+	          // serial.printfln("4");
 	       // serial.printfln("interrupt 4");
-	        /* Clear interrupt flag */
+	        // Clear interrupt flag
 	        EXTI_ClearITPendingBit(EXTI_Line4);
 	    }
 }
+
+void EXTI2_IRQHandler(void)
+{
+
+}
+
+void EXTI3_IRQHandler(void)
+{
+	while(42){
+		}
+	EXTI_ClearITPendingBit(EXTI_Line3);
+}
+
+void HardFault_Handler(void)
+{
+	while(1);
+}
+
+
 
 /*
  *   Dead Pingu in the Main !
